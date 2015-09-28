@@ -4,6 +4,7 @@ set MAKEINIT=MAKEINIT
 REM init logfile
 set LOG=%CD%\%CMDNAME%.log
 echo Logging to file: %LOG%
+echo %* > "%LOG%"
 REM get base dir - assumes script in %BASEDIR%\get_iplayer\windows
 for %%D in (%CMDDIR%..\..) do (
     set BASEDIR=%%~fD
@@ -11,11 +12,11 @@ for %%D in (%CMDDIR%..\..) do (
 REM location of Strawberry Perl
 set PERLDIST=E:\perl-5.18.2.2
 REM location of get_iplayer source
-set GIPDIR=%BASEDIR%\get_iplayer
+set GIPDIR=%BASEDIR%get_iplayer
 REM location of installer script
 set NSIDIR=%GIPDIR%\windows
-set NSIPFX=get_iplayer_setup
-set NSIFILE=%NSIPFX%.nsi
+set NSIPFX=get_iplayer
+set NSIFILE=%NSIPFX%_setup.nsi
 REM temp dir
 REM set TMPDIR=%TEMP%\%CMDNAME%%RANDOM%
 set TMPDIR=%CD%\%CMDNAME%.tmp
@@ -47,31 +48,40 @@ if "%GIPVER%"=="0.00" (
 )
 call :log get_iplayer version: %GIPVER%
 REM extract installer version
-set INSTVER=0.0
-for /f "usebackq tokens=1" %%V in (`perl -nle "print $1 if /^\s*\Wdefine\s+VERSION\W+(\d+\.\d+)/; exit if $1;" "%NSIDIR%\%NSIFILE%"`) do (
+set INSTVER=0.0.0
+for /f "usebackq tokens=1" %%V in (`perl -nle "print $1 if /^\s*\Wdefine\s+VERSION\W+(\d+(\.\d+){2})/; exit if $1;" "%NSIDIR%\%NSIFILE%"`) do (
     set INSTVER=%%V
 )
-if "%INSTVER%"=="0.0" (
+if "%INSTVER%"=="0.0.0" (
     call :log Could not determine installer version
     set BADVER=1
 )
-call :log Installer version: %INSTVER%
+call :log installer version: %INSTVER%
 REM extract Perl support version
-set PERLFILESVER=0.0
-for /f "usebackq tokens=1" %%V in (`perl -nle "print $1 if /^\s*\Wdefine\s+PERLFILESVER\W+(\d+\.\d+)/; exit if $1;" "%NSIDIR%\%NSIFILE%"`) do (
+set PERLFILESVER=0.0.0
+for /f "usebackq tokens=1" %%V in (`perl -nle "print $1 if /^\s*\Wdefine\s+PERLFILESVER\W+(\d+(\.\d+){2})/; exit if $1;" "%NSIDIR%\%NSIFILE%"`) do (
     set PERLFILESVER=%%V
 )
-if "%PERLFILESVER%"=="0.0" (
+if "%PERLFILESVER%"=="0.0.0" (
     call :log Could not determine Perl support version
     set BADVER=1
 )
-call :log Perl support version: %PERLFILESVER%
-REM perl support naming
+call :log perlfiles version: %PERLFILESVER%
+REM extract helpers version
+set HELPERSVER=0.0.0
+for /f "usebackq tokens=1" %%V in (`perl -nle "print $1 if /^\s*\Wdefine\s+HELPERSVER\W+(\d+(\.\d+){2})/; exit if $1;" "%NSIDIR%\%NSIFILE%"`) do (
+    set HELPERSVER=%%V
+)
+if "%HELPERSVER%"=="0.0.0" (
+    call :log Could not determine helpers version
+    set BADVER=1
+)
+if %BADVER% equ 1 goto die
+call :log helpers version: %HELPERSVER%
 set PAREXE=perlpar_%PERLFILESVER%.exe
 set GIPPFX=perlfiles_%PERLFILESVER%
 set GIPEXE=%GIPPFX%.exe
 set GIPZIP=%GIPPFX%.zip
-if %BADVER% equ 1 goto die
 :done
 exit /b
 :die

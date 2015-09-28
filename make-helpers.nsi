@@ -1,11 +1,15 @@
 ; CHANGE URLS TO MATCH CURRENT INSTALLER!
 
+!ifndef VERSION
+!define VERSION "0.0.0"
+!endif
+
 !ifndef BUILDPATH
 !define BUILDPATH "."
 !endif
 
 Name "make-helpers"
-OutFile "${BUILDPATH}\make-helpers.exe"
+OutFile "${BUILDPATH}\make-helpers_${VERSION}.exe"
 InstallDir "$EXEDIR\helpers"
 
 Page directory
@@ -14,20 +18,20 @@ Page instfiles
 !define USERAGENT "curl/7.21.7 (i386-pc-win32) libcurl/7.21.7 OpenSSL/0.9.8r zlib/1.2.5"
 
 ; Helper app names - used for folder/file naming, UI text
-!define MPLAYER "MPlayer"
-!define LAME "LAME"
+;!define MPLAYER "MPlayer"
+;!define LAME "LAME"
 !define FFMPEG "FFmpeg"
-!define VLC "VLC"
+;!define VLC "VLC"
 !define RTMPDUMP "RTMPDump"
 !define ATOMICPARSLEY "AtomicParsley"
 
 ; TODO: finalise URLs
 ; URLs for helper app downloads
 
-!define MPLAYER_URL "http://sourceforge.net/projects/get-iplayer/files/win32/utils/mplayer-svn-r32050-4.5.0/mplayer.exe/download"
-!define LAME_URL "http://www.rarewares.org/files/mp3/lame3.99.5.zip"
+;!define MPLAYER_URL "http://sourceforge.net/projects/get-iplayer/files/win32/utils/mplayer-svn-r32050-4.5.0/mplayer.exe/download"
+;!define LAME_URL "http://www.rarewares.org/files/mp3/lame3.99.5.zip"
 !define FFMPEG_URL "http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-2.2.3-win32-static.7z"
-!define VLC_URL "http://get.videolan.org/vlc/2.1.5/win32/vlc-2.1.5-win32.7z"
+;!define VLC_URL "http://get.videolan.org/vlc/2.1.5/win32/vlc-2.1.5-win32.7z"
 !define RTMPDUMP_URL "http://ffmpeg.zeranoe.com/builds/win32/external_libs/rtmpdump-20140302-git-79459a2-win32.7z"
 !define ATOMICPARSLEY_URL "https://bitbucket.org/jonhedgerows/atomicparsley/downloads/AtomicParsley-0.9.6-hg109.9183fff907bf.zip"
 
@@ -37,21 +41,25 @@ Page instfiles
 ; !define VLC_URL "http://www.infradead.org/cgi-bin/get_iplayer.cgi?vlc"
 ; !define RTMPDUMP_URL "http://www.infradead.org/cgi-bin/get_iplayer.cgi?rtmpdump"
 ; !define ATOMICPARSLEY_URL "http://www.infradead.org/cgi-bin/get_iplayer.cgi?atomicparsley"
-
+ 
+Function .onInit
+	StrCpy $INSTDIR "$INSTDIR_${VERSION}"
+FunctionEnd
+ 
 Section
   SetOutPath $INSTDIR
-  Push ${MPLAYER}
-  Push ${MPLAYER_URL}
-  Call DownloadHelper
-  Push ${LAME}
-  Push ${LAME_URL}
-  Call DownloadHelper
+  ;Push ${MPLAYER}
+  ;Push ${MPLAYER_URL}
+  ;Call DownloadHelper
+  ;Push ${LAME}
+  ;Push ${LAME_URL}
+  ;Call DownloadHelper
   Push ${FFMPEG}
   Push ${FFMPEG_URL}
   Call DownloadHelper
-  Push ${VLC}
-  Push ${VLC_URL}
-  Call DownloadHelper
+  ;Push ${VLC}
+  ;Push ${VLC_URL}
+  ;Call DownloadHelper
   Push ${RTMPDUMP}
   Push ${RTMPDUMP_URL}
   Call DownloadHelper

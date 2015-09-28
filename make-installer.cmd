@@ -31,8 +31,6 @@ if exist "%TMPDIR%" (
 )
 md "%TMPDIR%"
 call :log Temp directory: %TMPDIR%
-REM helper app archives folder in current dir
-set HELPERS=%CD%\helpers
 REM skip perl if requested
 if not "%WITHOUTPERL%"=="" (
     call :log Skipping perl support
@@ -82,6 +80,9 @@ set PERLFILES=%TMPDIR%\%GIPPFX%
 "%P7ZIP%" x "%PERLARC%" -o"%PERLFILES%" >> "%LOG%" 2>&1
 call :log ...Finished
 :perldone
+REM helper app archives folder in current dir
+set HELPERS=%CD%\helpers_%HELPERSVER%
+call :log Using helpers archive: %HELPERS%
 REM build in temp dir
 call :log Building installer...
 "%MAKENSIS%" /NOCD %WITHOUTPERL% %WITHSCRIPTS% %WITHHELPERS% %STANDALONE% %NOCONFIG% %NOCHECK% %PRERELEASE% ^
@@ -118,30 +119,22 @@ echo.
 echo Generate NSIS installer for get_iplayer
 echo.
 echo Usage:
-echo   %~n0 [/keeptmp] [/makeperl] [/withoutperl]
-echo     [/withscripts] [/withhelpers] [/standalone]
-echo     [/offline] [/prelease] [\path\to\perlfiles.zip]
+echo   %~n0 [/keeptmp] [/makeperl] [/withoutperl] [\path\to\perlfiles.zip]
 echo   %~n0 /? - this message
 echo.
 echo Parameters:
 echo   /keeptmp     - retain contents of temp directory
 echo   /makeperl    - force rebuild of Perl support archive
 echo   /withoutperl - omit Perl support from build
-echo   /withscripts - embed get_iplayer Perl scripts in build
-echo   /withhelpers - embed get_iplayer helper apps in build
-echo   /standalone  - /withscripts + /withhelpers
-echo   /noconfig    - use CGI script for download URLs instead of config file
-echo   /nocheck     - no installer update check (testing only)
-echo   /prerelease  - prerelease build with warning dialog at launch
 echo.
 echo Input (in current directory):
-echo   perlfiles     - expanded Perl support archive
+echo   perlfiles_X.Y.Z - expanded Perl support archive
 echo   OR (if expanded archive not found):
-echo   perlfiles.zip - Perl support archive file [output from make-perlfiles]
+echo   perlfiles_X.Y.Z.zip - Perl support archive file [output from make-perlfiles]
 echo     (override by specifying Perl archive file on command line)
-echo   helpers       - folder with helper app archives (/withhelpers only)
+echo   helpers_X.Y.Z - folder with helper app archives
 echo.
 echo Output (in current directory):
-echo   get_iplayer_setup_N.N.exe - installer EXE
-echo     (N.N = installer version)
+echo   get_iplayer-N.N.X.exe - installer EXE
+echo     (N.N = get_iplayer version)
 echo.

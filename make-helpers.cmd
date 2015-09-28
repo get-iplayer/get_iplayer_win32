@@ -14,6 +14,7 @@ if %ERRORLEVEL% neq 0 (
     goto die
 )
 call :log START %CMDNAME% %date% %time%
+set HLPEXE=%CMDNAME%_%HELPERSVER%.exe
 REM process command line
 for %%A in (%*) do (
     set FLAG=%%A
@@ -29,26 +30,26 @@ md "%TMPDIR%"
 call :log Temp directory: %TMPDIR%
 REM rebuild if requested
 if not "%REBUILD%"=="" goto rebuild
-if not exist "%CD%\%CMDNAME%.exe" goto rebuild
+if not exist "%CD%\%HLPEXE%" goto rebuild
 goto exeskip
 :rebuild
 REM build in temp dir
 call :log Building installer...
-"%MAKENSIS%" /NOCD /DBUILDPATH="%TMPDIR%" "%GIPDIR%\windows\%CMDNAME%.nsi" >> "%LOG%" 2>&1
+"%MAKENSIS%" /NOCD /DVERSION="%HELPERSVER%" /DBUILDPATH="%TMPDIR%" "%GIPDIR%\windows\%CMDNAME%.nsi" >> "%LOG%" 2>&1
 if %ERRORLEVEL% neq 0 (
     call :log ERROR: %MAKENSIS% failed
     goto die
 )
 call :log ...Finished
-copy /y "%TMPDIR%\%CMDNAME%.exe" "%CD%" >> "%LOG%" 2>&1
-call :log Created: %CD%\%CMDNAME%.exe
+copy /y "%TMPDIR%\%HLPEXE%" "%CD%" >> "%LOG%" 2>&1
+call :log Created: %CD%\%HLPEXE%
 :exeskip
 call :log Running installer...
-call %CD%\%CMDNAME%.exe
+call %CD%\%HLPEXE%
 call :log ...Finished
 REM clean up
 rd /q /s "%TMPDIR%" >> "%LOG%" 2>&1
-call :log FINISH %CMDNAME% %date% %time%
+call :log FINISH %HLPEXE% %date% %time%
 :done
 exit /b
 :die
