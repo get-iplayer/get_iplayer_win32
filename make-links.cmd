@@ -8,7 +8,7 @@ set GIPDIR=%BUILDDIR%\get_iplayer\get_iplayer-2.95
 set PERLDIR=%BUILDDIR%\perl\perl-5.24.0
 set UTILSDIR=%CMDDIR%\utils
 set ATOMICPARSLEYDIR=%UTILSDIR%\AtomicParsley-0.9.6
-set FFMPEGDIR=%UTILSDIR%\ffmpeg-3.0.1-win32-static
+set FFMPEGDIR=%UTILSDIR%\ffmpeg-3.0-win32-static
 set RTMPDUMPDIR=%UTILSDIR%\rtmpdump-v2.4-102-ga3a600d-get_iplayer
 del /q "%CMDDIR%\get_iplayer.pl"
 del /q "%CMDDIR%\get_iplayer.cgi"
@@ -24,3 +24,4 @@ mklink "%UTILSDIR%\AtomicParsley.exe" "%ATOMICPARSLEYDIR%\AtomicParsley.exe"
 mklink "%UTILSDIR%\ffmpeg.exe" "%FFMPEGDIR%\bin\ffmpeg.exe"
 mklink "%UTILSDIR%\ffplay.exe" "%FFMPEGDIR%\bin\ffplay.exe"
 mklink "%UTILSDIR%\rtmpdump.exe" "%RTMPDUMPDIR%\rtmpdump.exe"
+pause
