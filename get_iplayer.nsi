@@ -5,7 +5,7 @@
 ; name and version
 !define PRODUCT "get_iplayer"
 !define VERSION "2.95"
-!define PATCHLEVEL "0"
+!define PATCHLEVEL "1"
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
 ; build dirs
 !define BUILDDIR "build"
