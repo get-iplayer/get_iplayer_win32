@@ -109,6 +109,10 @@ copy /y "%PERLDIST%\c\bin\zlib*.dll" "%PARDIR%" >> "%LOG%" 2>&1
 copy /y "%PERLDIST%\c\bin\liblzma*.dll" "%PARDIR%" >> "%LOG%" 2>&1
 copy /y "%PERLDIST%\c\bin\libeay*.dll" "%PARDIR%" >> "%LOG%" 2>&1
 copy /y "%PERLDIST%\c\bin\ssleay*.dll" "%PARDIR%" >> "%LOG%" 2>&1
+REM patch Mozilla::CA
+copy /y "%PERLDIST%\perl\vendor\lib\Mozilla\CA.pm" "%PARDIR%\lib\Mozilla\CA.pm" >> "%LOG%" 2>&1
+perl -i.bak -p -e "s/__FILE__/\$INC\{\'Mozilla\/CA.pm\'\}/" "%PARDIR%\lib\Mozilla\CA.pm" >> "%LOG%" 2>&1
+del "%PARDIR%\lib\Mozilla\CA.pm.bak" >> "%LOG%" 2>&1
 call :log ...Finished
 REM create archive in build dir
 call :log Archiving Perl support files...
