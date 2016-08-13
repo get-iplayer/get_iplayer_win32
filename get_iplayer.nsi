@@ -7,6 +7,8 @@
 !define VERSION "2.95"
 !define PATCHLEVEL "2"
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
+; set version strings in perl scripts
+!system "make-version.cmd ${VERSION} ${PATCHLEVEL}"
 ; build dirs
 !define BUILDDIR "build"
 !define OUTDIR "${BUILDDIR}\installer"
