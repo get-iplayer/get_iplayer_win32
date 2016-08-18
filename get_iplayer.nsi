@@ -4,8 +4,8 @@
 
 ; name and version
 !define PRODUCT "get_iplayer"
-!define VERSION "2.95"
-!define PATCHLEVEL "2"
+!define VERSION "2.96"
+!define PATCHLEVEL "0"
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
 ; set version strings in perl scripts
 !system "make-version.cmd ${VERSION} ${PATCHLEVEL}"
