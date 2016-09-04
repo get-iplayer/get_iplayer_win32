@@ -5,7 +5,7 @@
 ; name and version
 !define PRODUCT "get_iplayer"
 !define VERSION "2.96"
-!define PATCHLEVEL "0"
+!define PATCHLEVEL "1"
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
 ; set version strings in perl scripts
 !system "make-version.cmd ${VERSION} ${PATCHLEVEL}"
@@ -495,11 +495,11 @@ Function UserCleanup
 		${If} $UserInstallDir != $INSTDIR
 		${AndIf} ${DirExists} $UserInstallDir
 !ifndef TESTERRORS
-			RMDir /r $UserInstallDir
+			; RMDir /r $UserInstallDir
 !endif
 			${If} ${DirExists} $UserInstallDir
 				StrCpy $Errors "$Errors\
-					$ErrNum. Failed to remove previous installation directory:$\r$\n$\t\
+					$ErrNum. Detected previous installation directory:$\r$\n$\t\
 					$UserInstallDir$\r$\n\
 					Remove manually. This action is not required.$\r$\n$\r$\n"
 				IntOp $ErrNum $ErrNum + 1
