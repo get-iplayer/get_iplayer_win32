@@ -201,8 +201,8 @@ FunctionEnd
 ; show warning on cancel
 !define MUI_ABORTWARNING
 ; icons
-!define MUI_ICON iplayer_logo.ico
-!define MUI_UNICON iplayer_uninst.ico
+!define MUI_ICON get_iplayer.ico
+!define MUI_UNICON get_iplayer_uninst.ico
 ; install pages
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "${GIPDIR}\LICENSE.txt"
@@ -324,6 +324,8 @@ Function InstCleanup
 	Delete "$INSTDIR\*.dll"
 	; remove old uninstaller
 	Delete "$INSTDIR\Uninst.exe"
+	; remove old icon
+	Delete "$INSTDIR\iplayer_logo.ico"
 	; remove old helpers
 	${RemoveHelper} "AtomicParsley" "atomicparsley" 
 	${RemoveHelper} "FFmpeg" "ffmpeg"
@@ -617,16 +619,16 @@ Section "-get_iplayer"
 	File pvr_manager.cmd
 	File run_pvr_scheduler.cmd
 	; start menu
-	File iplayer_logo.ico
+	File ${MUI_ICON}
 	CreateDirectory "$SMDirMain"
 	CreateShortCut "$SMDirMain\get_iplayer.lnk" "$SYSDIR\cmd.exe" \
-		"/k get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help" "$INSTDIR\iplayer_logo.ico"
+		"/k get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help" "$INSTDIR\${MUI_ICON}"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\get_iplayer.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	CreateShortCut "$SMDirMain\Web PVR Manager.lnk" "$SYSDIR\cmd.exe" \
-		"/c pvr_manager.cmd" "$INSTDIR\iplayer_logo.ico"
+		"/c pvr_manager.cmd" "$INSTDIR\${MUI_ICON}"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\Web PVR Manager.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	CreateShortCut "$SMDirMain\Run PVR Scheduler.lnk" "$SYSDIR\cmd.exe" \
-		"/k run_pvr_scheduler.cmd" "$INSTDIR\iplayer_logo.ico"
+		"/k run_pvr_scheduler.cmd" "$INSTDIR\${MUI_ICON}"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\Run PVR Scheduler.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	; help
 	CreateDirectory "$SMDirHelp"
@@ -716,7 +718,7 @@ Section "Uninstall"
 	Delete "$INSTDIR\pvr_manager.cmd"
 	Delete "$INSTDIR\run_pvr_scheduler.cmd"
 	; start menu
-	Delete "$INSTDIR\iplayer_logo.ico"
+	Delete "$INSTDIR\${MUI_ICON}"
 	Delete "$SMDirMain\get_iplayer.lnk"
 	Delete "$SMDirMain\Web PVR Manager.lnk"
 	Delete "$SMDirMain\Run PVR Scheduler.lnk"
