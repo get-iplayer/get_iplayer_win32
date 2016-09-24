@@ -19,20 +19,21 @@
 !define FFMPEGDIR "${UTILSDIR}\ffmpeg-3.0-win32-static"
 !define RTMPDUMPDIR "${UTILSDIR}\rtmpdump-v2.4-102-ga3a600d-get_iplayer"
 ; registry key for uninstall info
-!define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\get_iplayer"
+!define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
 ;#######################################
 ;# Settings
 ;#######################################
 
 BrandingText "${PRODUCT} ${WINVERSION}"
+InstallDir "$PROGRAMFILES\${PRODUCT}"
 Name "${PRODUCT}"
-InstallDir "$PROGRAMFILES\get_iplayer"
-OutFile "${OUTDIR}\get_iplayer-${WINVERSION}.exe"
+OutFile "${OUTDIR}\${PRODUCT}-${WINVERSION}.exe"
 RequestExecutionLevel admin
 SetCompressor /SOLID lzma
 VIAddVersionKey "FileDescription" "${PRODUCT} ${WINVERSION}"
 VIAddVersionKey "FileVersion" "${WINVERSION}.0"
+VIAddVersionKey "LegalCopyright" "Copyright (C) 2008-2010 Phil Lewis"
 VIAddVersionKey "ProductName" "${PRODUCT}"
 VIAddVersionKey "ProductVersion" "${WINVERSION}.0"
 VIProductVersion "${WINVERSION}.0"
@@ -249,14 +250,14 @@ Function CleanupInit
 	UserInfo::GetName
 	Pop $UserName
 	; profile dirs
-	ExpandEnvStrings $SysProfileDir "%ALLUSERSPROFILE%\get_iplayer"
-	StrCpy $UserProfileDir "$PROFILE\.get_iplayer"
+	ExpandEnvStrings $SysProfileDir "%ALLUSERSPROFILE%\${PRODUCT}"
+	StrCpy $UserProfileDir "$PROFILE\.${PRODUCT}"
 	; options files
 	StrCpy $SysOptionsFile "$SysProfileDir\options"
 	StrCpy $UserOptionsFile "$UserProfileDir\options"
 	; virtual store dirs
-	StrCpy $VirtualStoreDir32 "$LOCALAPPDATA\VirtualStore\Program Files\get_iplayer"
-	StrCpy $VirtualStoreDir64 "$LOCALAPPDATA\VirtualStore\Program Files (x86)\get_iplayer"
+	StrCpy $VirtualStoreDir32 "$LOCALAPPDATA\VirtualStore\Program Files\${PRODUCT}"
+	StrCpy $VirtualStoreDir64 "$LOCALAPPDATA\VirtualStore\Program Files (x86)\${PRODUCT}"
 	; output dir settings
 	${ConfigRead} $SysOptionsFile "output " $SysOutputDir
 	${ConfigRead} $UserOptionsFile "output " $UserOutputDir
@@ -270,7 +271,7 @@ Function CleanupInit
 	; user plugins dir
 	StrCpy $UserPluginsDir "$UserProfileDir\plugins"
 	; previous install location
-	ReadRegStr $UserInstallDir HKCU "Software\get_iplayer" ""
+	ReadRegStr $UserInstallDir HKCU "Software\${PRODUCT}" ""
 FunctionEnd
 
 ; remove files for old helper application
@@ -336,6 +337,7 @@ Function InstCleanup
 	; remove old settings
 	${ConfigWrite} $SysOptionsFile "mmsnothread " "" $0
 	${ConfigWrite} $SysOptionsFile "nopurge " "" $0
+	${ConfigWrite} $SysOptionsFile "output " "" $0
 	; remove obsolete sys profile dir
 	${If} ${DirExists} $SysProfileDir
 !ifndef TESTERRORS
@@ -668,7 +670,7 @@ Section "-get_iplayer"
 	WriteINIStr "$SMDirHelp\FFmpeg Documentation.url" "InternetShortcut" "URL" "${FFMPEGDOC}"
 	WriteINIStr "$SMDirHelp\RTMPDump Documentation.url" "InternetShortcut" "URL" "${RTMPDUMPDOC}"
 !endif
-	; prepend install dir to system path
+	; append install dir to system path
 	ClearErrors
 !ifndef TESTERRORS
 	${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR"
