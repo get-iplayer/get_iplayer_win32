@@ -307,6 +307,7 @@ Function InstCleanup
 	Delete "$INSTDIR\nsis_docs.url"
 	Delete "$INSTDIR\strawberry_docs.url"
 	Delete "$INSTDIR\download_latest_installer.url"
+	Delete "$INSTDIR\pvr_manager.url"
 	; remove old registry key
 	DeleteRegValue HKLM ${UNINSTKEY} "Publisher"
 	; remove old version files
@@ -614,7 +615,6 @@ Section "-get_iplayer"
 	File get_iplayer.cgi.cmd
 	File get_iplayer.cmd
 	File pvr_manager.cmd
-	File pvr_manager.url
 	File run_pvr_scheduler.cmd
 	; start menu
 	File iplayer_logo.ico
@@ -714,7 +714,6 @@ Section "Uninstall"
 	Delete "$INSTDIR\get_iplayer.cgi.cmd"
 	Delete "$INSTDIR\get_iplayer.cmd"
 	Delete "$INSTDIR\pvr_manager.cmd"
-	Delete "$INSTDIR\pvr_manager.url"
 	Delete "$INSTDIR\run_pvr_scheduler.cmd"
 	; start menu
 	Delete "$INSTDIR\iplayer_logo.ico"
