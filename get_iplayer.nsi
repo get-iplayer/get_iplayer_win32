@@ -4,7 +4,7 @@
 
 ; name and version
 !define PRODUCT "get_iplayer"
-!define VERSION "2.99"
+!define VERSION "3.00"
 !define PATCHLEVEL "0"
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
 ; set version strings in perl scripts
@@ -13,11 +13,10 @@
 !define BUILDDIR "build"
 !define OUTDIR "${BUILDDIR}\installer"
 !define GIPDIR "${BUILDDIR}\get_iplayer\get_iplayer-${VERSION}"
-!define PERLDIR "${BUILDDIR}\perl\perl-5.24.0"
+!define PERLDIR "${BUILDDIR}\perl\perl-5.24.1"
 !define UTILSDIR "utils"
 !define ATOMICPARSLEYDIR "${UTILSDIR}\AtomicParsley-0.9.6"
-!define FFMPEGDIR "${UTILSDIR}\ffmpeg-3.0-win32-static"
-!define RTMPDUMPDIR "${UTILSDIR}\rtmpdump-v2.4-102-ga3a600d-get_iplayer"
+!define FFMPEGDIR "${UTILSDIR}\ffmpeg-3.2.4-win32-static"
 ; registry key for uninstall info
 !define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
@@ -82,7 +81,6 @@ ${StrLoc}
 ; documentation URLs for utils
 !define ATOMICPARSLEYDOC "http://atomicparsley.sourceforge.net/"
 !define FFMPEGDOC "http://ffmpeg.org/documentation.html"
-!define RTMPDUMPDOC "http://rtmpdump.mplayerhq.hu/"
 ; repo URLs
 !define GIPREPO "https://github.com/get-iplayer/get_iplayer"
 !define INSTREPO "https://github.com/get-iplayer/get_iplayer_win32"
@@ -353,6 +351,11 @@ Function InstCleanup
 			IntOp $ErrNum $ErrNum + 1
 		${EndIf}
 	${EndIf}
+	; clean up obsolete items in 3.00.0+
+	; remove RTMPDump
+	Delete "$INSTDIR\utils\rtmpdump.exe"
+	RMDir /r "$INSTDIR\utils\licenses\rtmpdump"
+	Delete "$SMDirHelp\RTMPDump Documentation.url"
 FunctionEnd
 
 ; Trim
@@ -656,19 +659,15 @@ Section "-get_iplayer"
 	SetOutPath "$INSTDIR\utils"
 	File "${ATOMICPARSLEYDIR}\AtomicParsley.exe"
 	File "${FFMPEGDIR}\bin\ffmpeg.exe"
-	File "${RTMPDUMPDIR}\rtmpdump.exe"
 	File sources.txt
 	SetOutPath "$INSTDIR\utils\licenses\atomicparsley"
 	File "${ATOMICPARSLEYDIR}\COPYING"
 	SetOutPath "$INSTDIR\utils\licenses\ffmpeg"
 	File "${FFMPEGDIR}\README.txt"
 	File "${FFMPEGDIR}\licenses\*.*"
-	SetOutPath "$INSTDIR\utils\licenses\rtmpdump"
-	File "${RTMPDUMPDIR}\COPYING"
 	SetOutPath $INSTDIR
 	WriteINIStr "$SMDirHelp\AtomicParsley Documentation.url" "InternetShortcut" "URL" "${ATOMICPARSLEYDOC}"
 	WriteINIStr "$SMDirHelp\FFmpeg Documentation.url" "InternetShortcut" "URL" "${FFMPEGDOC}"
-	WriteINIStr "$SMDirHelp\RTMPDump Documentation.url" "InternetShortcut" "URL" "${RTMPDUMPDOC}"
 !endif
 	; append install dir to system path
 	ClearErrors
@@ -739,7 +738,6 @@ Section "Uninstall"
 	RMDir /r "$INSTDIR\utils"
 	Delete "$SMDirHelp\AtomicParsley Documentation.url"
 	Delete "$SMDirHelp\FFmpeg Documentation.url"
-	Delete "$SMDirHelp\RTMPDump Documentation.url"
 !endif
 	; start menu sub-folders
 	RMDir "$SMDirHelp"

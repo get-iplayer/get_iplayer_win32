@@ -37,6 +37,25 @@ if not exist "%COIDIR%" (
     call :log ERROR: Cannot find %COIDIR%
     goto die
 )
+REM assume use of portable Strawberry Perl
+set PERLEXE=none
+for /f "usebackq" %%A in (`perl -e "print $^X;"`) do (
+    set PERLEXE=%%A
+)
+if "%PERLEXE%" == "none" (
+    call :log ERROR: Perl executable not discovered
+    goto die
+)
+if not exist "%PERLEXE%" (
+    call :log ERROR: Perl executable not found: %PERLEXE%
+    goto die
+)
+set PERLDIST=%PERLEXE:\perl\bin\perl.exe=%
+if not exist "%PERLDIST%" (
+    call :log ERROR: Perl installation not found: %PERLDIST%
+    goto die
+)
+call :log Perl installation: %PERLDIST%
 REM determine Perl version
 set PERLVER=0.0.0
 for /f "usebackq tokens=1-3 delims=v." %%A in (`perl -e "print $^V;"`) do (
@@ -62,8 +81,8 @@ REM force XML modules into PAR
 set PPMODS=%PPMODS% -M XML::LibXML -M XML::LibXML::SAX -M XML::LibXML::SAX::Parser -M XML::SAX::PurePerl -M XML::SAX::Expat -M XML::Parser
 REM force JSON modules into PAR
 set PPMODS=%PPMODS% -M JSON -M JSON::XS -M JSON::PP
-REM include optional modules
-set PPMODS=%PPMODS% -M MP3::Tag -M MP3::Info -M Net::SMTP -M Net::SMTP::SSL -M Authen::SASL -M Net::SMTP::TLS::ButMaintained
+REM force Mojolicious into PAR
+set PPMODS=%PPMODS% -M Mojolicious
 call :log Running pp...
 REM run pp
 call "%PP%" %PPMODS% -B -p -o "%PARPAR%" "%COIDIR%\get_iplayer" "%COIDIR%\get_iplayer.cgi" >> "%LOG%" 2>&1
@@ -93,8 +112,6 @@ REM unpack lib dir from PAR
 call :log Unpacking Perl library...
 "%P7ZIP%" x "%PARPAR%" -o"%PARDIR%" -aoa
 call :log ...Finished
-REM assume use of portable Strawberry Perl
-set PERLDIST=%drivep%
 REM copy additional files from Strawberry Perl
 call :log Copying Perl support files...
 xcopy "%PERLDIST%\licenses\perl\*.*" "%PARDIR%\licenses" /e /i /r /y >> "%LOG%" 2>&1
@@ -150,9 +167,4 @@ echo     (N.N.N = Perl version)
 echo.
 echo Required CPAN modules:
 echo   PAR::Packer - archive creation
-echo   MP3::Info - localfiles plugin
-echo   MP3::Tag - MP3 tagging
-echo   Authen::SASL - secure email
-echo   Net::SMTP::SSL - secure email
-echo   Net::SMTP::TLS::ButMaintained - secure email
 echo.
