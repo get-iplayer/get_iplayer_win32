@@ -4,7 +4,7 @@
 
 ; name and version
 !define PRODUCT "get_iplayer"
-!define VERSION "3.01"
+!define VERSION "3.02"
 !define PATCHLEVEL "0"
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
 ; set version strings in perl scripts
@@ -73,6 +73,7 @@ ${StrLoc}
 !include nsDialogs.nsh
 !include TextFunc.nsh
 !include WinMessages.nsh
+!include WinVer.nsh
 
 ;#######################################
 ;# URLs
@@ -597,6 +598,17 @@ FunctionEnd
 !define InitSMDirs "!insertmacro _InitSMDirs"
 
 Function .onInit
+	${IfNot} ${AtLeastWin7}
+		MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 \
+			"NOTE:$\r$\n$\r$\n \
+			- Windows 7 is the minimum version supported by the get_iplayer developer$\r$\n \
+			- The bundled version of ffmpeg does not work on earlier Windows versions$\r$\n \
+			- You must replace the bundled version of ffmpeg in order to convert output files to MP4 and add metadata tags$\r$\n$\r$\n \
+			Do you wish to proceed with the installation?" \
+			IDYES proceed
+			Quit
+		proceed:
+	${EndIf}
 	SetShellVarContext all
 	${InitSMDirs}
 	StrCpy $ErrNum 1
