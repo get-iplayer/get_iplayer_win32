@@ -4,7 +4,7 @@
 
 ; name and version
 !define PRODUCT "get_iplayer"
-!define VERSION "3.02"
+!define VERSION "3.03"
 !define PATCHLEVEL "0"
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
 ; set version strings in perl scripts
@@ -16,7 +16,7 @@
 !define PERLDIR "${BUILDDIR}\perl\perl-5.24.1"
 !define UTILSDIR "utils"
 !define ATOMICPARSLEYDIR "${UTILSDIR}\AtomicParsley-0.9.6"
-!define FFMPEGDIR "${UTILSDIR}\ffmpeg-3.2.4-win32-static"
+!define FFMPEGDIR "${UTILSDIR}\ffmpeg-3.3.3-win32-static"
 ; registry key for uninstall info
 !define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
