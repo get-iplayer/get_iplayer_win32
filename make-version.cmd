@@ -30,8 +30,8 @@ call :log get_iplayer version: %COIVER%
 REM get_iplayer script dir
 set COIDIR=%GIPDIR%\get_iplayer-%COIVER%
 REM put version string in scripts
-perl -i.bak -p -e "s/^(my \$version_text).*$/$1 = \"%1-windows.%2\";/" "%COIDIR%\get_iplayer" >> "%LOG%" 2>&1
-perl -i.bak -p -e "s/^(my \$VERSION_TEXT).*$/$1 = \"%1-windows.%2\";/" "%COIDIR%\get_iplayer.cgi" >> "%LOG%" 2>&1
+perl -i.bak -p -e "s/^(my \$version_text).*$/$1 = \"%1.%2\";/" "%COIDIR%\get_iplayer" >> "%LOG%" 2>&1
+perl -i.bak -p -e "s/^(my \$VERSION_TEXT).*$/$1 = \"%1.%2\";/" "%COIDIR%\get_iplayer.cgi" >> "%LOG%" 2>&1
 del "%COIDIR%\get_iplayer.bak" >> "%LOG%" 2>&1
 del "%COIDIR%\get_iplayer.cgi.bak" >> "%LOG%" 2>&1
 call :log FINISH %CMDNAME% %date% %time%
