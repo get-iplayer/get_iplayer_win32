@@ -398,29 +398,6 @@ Done:
 	Exch $R1
 FunctionEnd
 
-; obsolete SWF URL from June 2013 debacle
-!define OLDSWFURL "http://www.bbc.co.uk/emp/releases/iplayer/revisions/617463_618125_4/617463_618125_4_emp.swf"
-!macro _DeleteSwfUrl201306 _key
-	StrCpy $1 "$PROFILE\.get_iplayer\options"
-	IfFileExists $1 0 no_options_${_key}
-		StrCpy $2 "${OLDSWFURL}"
-		StrCpy $3 "--swfVfy"
-		${ConfigRead} $1 "${_key} " $R0
-		Push $R0
-		Call Trim
-		Pop $R0
-		${StrLoc} $4 $R0 $2 ">"
-		IntCmp $4 0 ${_key}1 0
-			${ConfigWrite} $1 "${_key}" "" $R1
-			Goto ${_key}2
-		${_key}1:
-		StrCmp $R0 $3 0 ${_key}2
-			${ConfigWrite} $1 "${_key}" "" $R1
-		${_key}2:
-	no_options_${_key}:
-!macroend
-!define DeleteSwfUrl201306 "!insertmacro _DeleteSwfUrl201306"
-
 ; clean up previous installation
 Function UserCleanup
 	SetShellVarContext current
@@ -548,47 +525,6 @@ Function UserCleanup
 			IntOp $ErrNum $ErrNum + 1
 		${EndIf}
 	${EndIf}
-	; June 2013 SWF URL debacle
-	${If} ${FileExists} $UserOptionsFile
-!ifndef TESTERRORS
-		${DeleteSwfUrl201306} "rtmptvopts"
-		${DeleteSwfUrl201306} "rtmpradioopts"
-		${DeleteSwfUrl201306} "rtmplivetvopts"
-		${DeleteSwfUrl201306} "rtmpliveradioopts"
-!endif
-		${ConfigRead} $UserOptionsFile "rtmptvopts " $1
-		${ConfigRead} $UserOptionsFile "rtmpradioopts " $2
-		${ConfigRead} $UserOptionsFile "rtmplivetvopts " $3
-		${ConfigRead} $UserOptionsFile "rtmpliveradioopts " $4
-		${StrLoc} $R1 $1 "${OLDSWFURL}" ">"
-		${StrLoc} $R2 $2 "${OLDSWFURL}" ">"
-		${StrLoc} $R3 $3 "${OLDSWFURL}" ">"
-		${StrLoc} $R4 $4 "${OLDSWFURL}" ">"
-		${If} $R1 <> 0
-			StrCpy $R9 "$R9$\trtmptvopts $1$\r$\n"
-		${EndIf}
-		${If} $R2 <> 0
-			StrCpy $R9 "$R9$\trtmpradioopts $2$\r$\n"
-		${EndIf}
-		${If} $R3 <> 0
-			StrCpy $R9 "$R9$\trtmplivetvopts $3$\r$\n"
-		${EndIf}
-		${If} $R4 <> 0
-			StrCpy $R9 "$R9$\trtmpliveradioopts $4$\r$\n"
-		${EndIf}
-		${If} $R9 != ""
-			StrCpy $Errors "$Errors\
-				$ErrNum. Failed to remove options containing obsolete SWF URL:$\r$\n\
-				$R9\
-				from user options file:$\r$\n$\t\
-				$UserOptionsFile$\r$\n\
-				Edit file and remove options manually. This action is not required, but you may$\r$\n\
-				encounter problems in a future release if you do not delete the obsolete entries.$\r$\n$\r$\n"
-			IntOp $ErrNum $ErrNum + 1
-		${EndIf}
-	${EndIf}
-	; set message for results page
-	StrCpy $Results "${RESULTS}"
 FunctionEnd
 
 ;#######################################
