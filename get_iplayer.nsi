@@ -357,6 +357,9 @@ Function InstCleanup
 	Delete "$INSTDIR\utils\rtmpdump.exe"
 	RMDir /r "$INSTDIR\utils\licenses\rtmpdump"
 	Delete "$SMDirHelp\RTMPDump Documentation.url"
+	; clean up obsolete items in 3.06.0+
+	Delete "$INSTDIR\pvr_manager.cmd"
+	Delete "$INSTDIR\run_pvr_scheduler.cmd"
 FunctionEnd
 
 ; Trim
@@ -633,8 +636,8 @@ Section "-get_iplayer"
 	; batch files
 	File get_iplayer.cgi.cmd
 	File get_iplayer.cmd
-	File pvr_manager.cmd
-	File run_pvr_scheduler.cmd
+	File get_iplayer_web_pvr.cmd
+	File get_iplayer_pvr.cmd
 	; start menu
 	File ${MUI_ICON}
 	CreateDirectory "$SMDirMain"
@@ -642,10 +645,10 @@ Section "-get_iplayer"
 		"/k get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help" "$INSTDIR\${MUI_ICON}"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\get_iplayer.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	CreateShortCut "$SMDirMain\Web PVR Manager.lnk" "$SYSDIR\cmd.exe" \
-		"/c pvr_manager.cmd" "$INSTDIR\${MUI_ICON}"
+		"/c get_iplayer_web_pvr.cmd" "$INSTDIR\${MUI_ICON}"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\Web PVR Manager.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	CreateShortCut "$SMDirMain\Run PVR Scheduler.lnk" "$SYSDIR\cmd.exe" \
-		"/k run_pvr_scheduler.cmd" "$INSTDIR\${MUI_ICON}"
+		"/k get_iplayer_pvr.cmd" "$INSTDIR\${MUI_ICON}"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\Run PVR Scheduler.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	; help
 	CreateDirectory "$SMDirHelp"
@@ -728,8 +731,8 @@ Section "Uninstall"
 	; batch files
 	Delete "$INSTDIR\get_iplayer.cgi.cmd"
 	Delete "$INSTDIR\get_iplayer.cmd"
-	Delete "$INSTDIR\pvr_manager.cmd"
-	Delete "$INSTDIR\run_pvr_scheduler.cmd"
+	Delete "$INSTDIR\get_iplayer_web_pvr.cmd"
+	Delete "$INSTDIR\get_iplayer_pvr.cmd"
 	; start menu
 	Delete "$INSTDIR\${MUI_ICON}"
 	Delete "$SMDirMain\get_iplayer.lnk"
