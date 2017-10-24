@@ -82,7 +82,7 @@ ${StrLoc}
 ;#######################################
 
 ; documentation URLs for utils
-!define ATOMICPARSLEYDOC "http://atomicparsley.sourceforge.net/"
+!define ATOMICPARSLEYDOC "http://atomicparsley.sourceforge.net"
 !define FFMPEGDOC "http://ffmpeg.org/documentation.html"
 ; repo URLs
 !define GIPREPO "https://github.com/get-iplayer/get_iplayer"
@@ -360,6 +360,7 @@ Function InstCleanup
 	; clean up obsolete items in 3.06.0+
 	Delete "$INSTDIR\pvr_manager.cmd"
 	Delete "$INSTDIR\run_pvr_scheduler.cmd"
+	Delete "$SMDirHelp\get_iplayer Examples.url"
 FunctionEnd
 
 ; Trim
@@ -589,7 +590,6 @@ Section "-get_iplayer"
 	; help
 	CreateDirectory "$SMDirHelp"
 	WriteINIStr "$SMDirHelp\get_iplayer Documentation.url" "InternetShortcut" "URL" "${GIPREPO}/wiki"
-	WriteINIStr "$SMDirHelp\get_iplayer Examples.url" "InternetShortcut" "URL" "${GIPREPO}/wiki/documentation"
 	; update
 	CreateDirectory "$SMDirUpdate"
 	WriteINIStr "$SMDirUpdate\Check for Update.url" "InternetShortcut" "URL" "${INSTREPO}/releases"
@@ -603,8 +603,9 @@ Section "-get_iplayer"
 	File "${PERLDIR}\*.dll"
 	File "${PERLDIR}\perl.exe"
 	SetOutPath $INSTDIR
-	WriteINIStr "$SMDirHelp\Strawberry Perl Home.url" "InternetShortcut" "URL" "http://strawberryperl.com/"
 !endif
+	WriteINIStr "$SMDirHelp\Perl Documentation.url" "InternetShortcut" "URL" "http://perldoc.perl.org"
+	WriteINIStr "$SMDirHelp\Strawberry Perl Home.url" "InternetShortcut" "URL" "http://strawberryperl.com"
 !ifndef NOUTILS
 	; utils
 	SetOutPath "$INSTDIR\utils"
@@ -617,9 +618,9 @@ Section "-get_iplayer"
 	File "${FFMPEGDIR}\README.txt"
 	File "${FFMPEGDIR}\licenses\*.*"
 	SetOutPath $INSTDIR
+!endif
 	WriteINIStr "$SMDirHelp\AtomicParsley Documentation.url" "InternetShortcut" "URL" "${ATOMICPARSLEYDOC}"
 	WriteINIStr "$SMDirHelp\FFmpeg Documentation.url" "InternetShortcut" "URL" "${FFMPEGDOC}"
-!endif
 	; append install dir to system path
 	ClearErrors
 !ifndef TESTERRORS
@@ -678,20 +679,20 @@ Section "Uninstall"
 	Delete "$SMDirMain\Run PVR Scheduler.lnk"
 	; help
 	Delete "$SMDirHelp\get_iplayer Documentation.url"
-	Delete "$SMDirHelp\get_iplayer Examples.url"
 	; update
 	Delete "$SMDirUpdate\Check for Update.url"
 !ifndef NOPERL
 	; Perl
 	RMDir /r "$INSTDIR\perl"
-	Delete "$SMDirHelp\Strawberry Perl Home.url"
 !endif
+	Delete "$SMDirHelp\Perl Documentation.url"
+	Delete "$SMDirHelp\Strawberry Perl Home.url"
 !ifndef NOUTILS
 	; utils
 	RMDir /r "$INSTDIR\utils"
+!endif
 	Delete "$SMDirHelp\AtomicParsley Documentation.url"
 	Delete "$SMDirHelp\FFmpeg Documentation.url"
-!endif
 	; start menu sub-folders
 	RMDir "$SMDirHelp"
 	RMDir "$SMDirUpdate"
