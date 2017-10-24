@@ -310,8 +310,6 @@ Function InstCleanup
 	Delete "$INSTDIR\strawberry_docs.url"
 	Delete "$INSTDIR\download_latest_installer.url"
 	Delete "$INSTDIR\pvr_manager.url"
-	; remove old registry key
-	DeleteRegValue HKLM ${UNINSTKEY} "Publisher"
 	; remove old version files
 	Delete "$INSTDIR\get_iplayer-ver.txt"
 	Delete "$INSTDIR\get_iplayer-ver-check.txt"
@@ -647,10 +645,12 @@ Section "-Uninstaller"
 	CreateShortCut "$SMDirMain\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 	; add uninstall info to registry
 	WriteRegStr HKLM ${UNINSTKEY} "DisplayIcon" "$INSTDIR\uninstall.exe"
-	WriteRegStr HKLM ${UNINSTKEY} "DisplayName" "$(^Name)"
+	WriteRegStr HKLM ${UNINSTKEY} "DisplayName" "$(^Name) ${WINVERSION}"
 	WriteRegStr HKLM ${UNINSTKEY} "DisplayVersion" "${WINVERSION}"
+	WriteRegStr HKLM ${UNINSTKEY} "HelpLink" "${GIPREPO}/wiki"
+	WriteRegStr HKLM ${UNINSTKEY} "Publisher" "The ${PRODUCT} Contributors"
 	WriteRegStr HKLM ${UNINSTKEY} "UninstallString" "$INSTDIR\uninstall.exe"
-	WriteRegStr HKLM ${UNINSTKEY} "URLInfoAbout" "${INSTREPO}"
+	WriteRegStr HKLM ${UNINSTKEY} "URLInfoAbout" "${GIPREPO}"
 	WriteRegStr HKLM ${UNINSTKEY} "URLUpdateInfo" "${INSTREPO}/releases"
 SectionEnd
 
