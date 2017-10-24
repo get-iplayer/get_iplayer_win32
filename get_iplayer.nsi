@@ -29,7 +29,7 @@
 BrandingText "${PRODUCT} ${WINVERSION}"
 InstallDir "$PROGRAMFILES\${PRODUCT}"
 Name "${PRODUCT}"
-OutFile "${OUTDIR}\${PRODUCT}-${WINVERSION}.exe"
+OutFile "${OUTDIR}\${PRODUCT}-${WINVERSION}-installer.exe"
 RequestExecutionLevel admin
 SetCompressor /SOLID lzma
 VIAddVersionKey "FileDescription" "${PRODUCT} ${WINVERSION}"
