@@ -7,6 +7,8 @@
 !define VERSION "3.05"
 !define PATCHLEVEL "0"
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
+; copy get_iplayer scripts
+!system "make-gip.cmd v${VERSION}"
 ; set version strings in perl scripts
 !system "make-version.cmd ${VERSION} ${PATCHLEVEL}"
 ; build dirs
