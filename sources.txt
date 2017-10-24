@@ -5,4 +5,3 @@ https://bitbucket.org/dinkypumpkin/atomicparsley
 FFmpeg
 ======
 https://ffmpeg.zeranoe.com/builds/
-https://ffmpeg.zeranoe.com/blog/?cat=6
