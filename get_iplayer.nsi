@@ -540,10 +540,13 @@ FunctionEnd
 Function .onInit
 	${IfNot} ${AtLeastWin7}
 		MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 \
-			"NOTE:$\r$\n$\r$\n \
-			- Windows 7 is the minimum version supported by the get_iplayer developer$\r$\n \
-			- The bundled version of ffmpeg does not work on earlier Windows versions$\r$\n \
-			- You must replace the bundled version of ffmpeg in order to convert output files to MP4 and add metadata tags$\r$\n$\r$\n \
+			"NOTE: $(^Name) is not supported by the developer for use on Windows XP or Vista. \
+			Windows 7 is the minimum version required by the bundled version of ffmpeg. \
+			ffmpeg is not required to download programmes, but it is required to convert \
+			output files to MP4 and to add metadata tags. If you wish to use $(^Name) \
+			on Windows XP or Vista, you must install a compatible version of ffmpeg in \
+			the following directory:$\r$\n$\r$\n\
+			$INSTDIR\utils$\r$\n$\r$\n\
 			Do you wish to proceed with the installation?" \
 			IDYES proceed
 			Quit
@@ -610,7 +613,9 @@ Section "-get_iplayer"
 	; utils
 	SetOutPath "$INSTDIR\utils"
 	File "${ATOMICPARSLEYDIR}\AtomicParsley.exe"
-	File "${FFMPEGDIR}\bin\ffmpeg.exe"
+	${If} ${AtLeastWin7}
+		File "${FFMPEGDIR}\bin\ffmpeg.exe"
+	${EndIf}
 	File sources.txt
 	SetOutPath "$INSTDIR\utils\licenses\atomicparsley"
 	File "${ATOMICPARSLEYDIR}\COPYING"
