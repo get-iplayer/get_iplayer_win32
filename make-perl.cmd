@@ -11,58 +11,71 @@ if #%CMDDIR:~-1%# == #\# set CMDDIR=%CMDDIR:~0,-1%
 REM Perl build dir
 set PERLDIR=%CMDDIR%\build\perl
 if not exist "%PERLDIR%" (
-    md "%PERLDIR%"
+	md "%PERLDIR%"
 )
 REM init logfile
 set LOG=%PERLDIR%\%CMDNAME%.log
 echo Logging to file: %LOG%
 echo %* > "%LOG%"
 call :log START %CMDNAME% %date% %time%
-REM process version
-set GIPVER=%1
-if "%GIPVER%"=="" (
-    call :log ERROR: get_iplayer version missing
+REM process get_iplayer version
+set ARG1=%1
+if "%ARG1%"=="" (
+	call :log ERROR: get_iplayer version missing
 	goto die
 )
-set COIVER=%GIPVER%
-if "!COIVER:~0,1!"=="v" (
-    set COIVER=!COIVER:~1!
+if "%ARG1:~0,1%"=="/" (
+	call :log ERROR: get_iplayer version cannot be flag parameter
+	goto die
 )
-call :log get_iplayer version: %COIVER%
+REM process setup build number
+set ARG2=%2
+if "%ARG2%"=="" (
+	call :log ERROR: setup build number missing
+	goto die
+)
+if "%ARG2:~0,1%"=="/" (
+	call :log ERROR: setup build number cannot be flag parameter
+	goto die
+)
+set GIPVER=%ARG1%
+set COIVER=%ARG1%.%ARG2%
+call :log get_iplayer version: %GIPVER%
+call :log setup version: %COIVER%
 REM get_iplayer build dir
 set GIPDIR=%CMDDIR%\build\get_iplayer
 REM get_iplayer files dir
 set COIDIR=%GIPDIR%\get_iplayer-%COIVER%
 if not exist "%COIDIR%" (
-    call :log ERROR: Cannot find %COIDIR%
-    goto die
+	call :log ERROR: Cannot find %COIDIR%
+	goto die
 )
 REM assume use of portable Strawberry Perl
 set PERLEXE=none
 for /f "usebackq" %%A in (`perl -e "print $^X;"`) do (
-    set PERLEXE=%%A
+	set PERLEXE=%%A
 )
 if "%PERLEXE%" == "none" (
-    call :log ERROR: Perl executable not discovered
-    goto die
+	call :log ERROR: Perl executable not discovered
+	goto die
 )
 if not exist "%PERLEXE%" (
-    call :log ERROR: Perl executable not found: %PERLEXE%
-    goto die
+	call :log ERROR: Perl executable not found: %PERLEXE%
+	goto die
 )
 set PERLDIST=%PERLEXE:\perl\bin\perl.exe=%
 if not exist "%PERLDIST%" (
-    call :log ERROR: Perl installation not found: %PERLDIST%
-    goto die
+	call :log ERROR: Perl installation not found: %PERLDIST%
+	goto die
 )
 call :log Perl installation: %PERLDIST%
 REM determine Perl version
 set PERLVER=0.0.0
 for /f "usebackq tokens=1-3 delims=v." %%A in (`perl -e "print $^V;"`) do (
-    set PERLVER=%%A.%%B.%%C
+	set PERLVER=%%A.%%B.%%C
 )
 if "%PERLVER%"=="0.0.0" (
-    call :log ERROR: Could not determine Perl version
+	call :log ERROR: Could not determine Perl version
 	goto die
 )
 call :log Perl version: %PERLVER%
@@ -88,21 +101,21 @@ REM run pp
 call "%PP%" %PPMODS% -B -p -o "%PARPAR%" "%COIDIR%\get_iplayer" "%COIDIR%\get_iplayer.cgi" >> "%LOG%" 2>&1
 REM check result
 if %ERRORLEVEL% neq 0 (
-    call :log ERROR: %PP% failed
-    goto die
+	call :log ERROR: %PP% failed
+	goto die
 )
 call :log ...Finished
 REM make sure that PAR file is available
 if not exist "%PARPAR%" (
-    call :log ERROR: Cannot find %PARPAR%
-    goto die
+	call :log ERROR: Cannot find %PARPAR%
+	goto die
 )
 REM create clean output dir
 for %%X in (%PARPAR%) do (
-    set PARDIR=%PERLDIR%\%%~nX
+	set PARDIR=%PERLDIR%\%%~nX
 )
 if exist "%PARDIR%" (
-    rd /q /s "%PARDIR%" >> "%LOG%" 2>&1
+	rd /q /s "%PARDIR%" >> "%LOG%" 2>&1
 )
 md "%PARDIR%" >> "%LOG%" 2>&1
 call :log Perl support files: %PARDIR%
@@ -154,16 +167,21 @@ echo.
 echo Create Perl support files for get_iplayer
 echo.
 echo Usage:
-echo   %~n0 VERSION
+echo   %~n0 GiPVersion SetupBuild
 echo   %~n0 /? - this message
 echo.
 echo Parameters:
-echo   VERSION - get_iplayer version (from make-gip.cmd)
+echo   GiPVersion - get_iplayer version (X.YY)
+echo   SetupBuild - setup build number (Z)
 echo.
 echo Output (in build\perl):
-echo   perl-N.N.N     - Perl support files
+echo   perl-N.N.N	 - Perl support files
 echo   perl-N.N.N.zip - Perl support files archive
-echo     (N.N.N = Perl version)
+echo	 (N.N.N = Perl version)
+echo.
+echo Input (in build\get_iplayer\get_iplayer-X.YY.Z):
+echo   get_iplayer - get_iplayer script
+echo   get_iplayer.cgi - web pvr script
 echo.
 echo Required CPAN modules:
 echo   PAR::Packer - archive creation

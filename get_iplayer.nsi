@@ -4,16 +4,32 @@
 
 ; name and version
 !define PRODUCT "get_iplayer"
-!define VERSION "3.06"
-!define PATCHLEVEL "1"
+!ifndef VERSION
+!define VERSION "9.99"
+!endif
+!ifndef PATCHLEVEL
+!define PATCHLEVEL "9"
+!endif
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
-; copy get_iplayer scripts
-!system "make-gip.cmd v${VERSION}"
-; set version strings in perl scripts
-!system "make-version.cmd ${VERSION} ${PATCHLEVEL}"
+; copy get_iplayer scripts and set version strings
+!system "make-gip.cmd ${VERSION} ${PATCHLEVEL}"
+; installer suffix
+!define SUFFIX "-installer"
+!ifdef NOPERL
+!define SUFFIX1 "-noperl"
+!else
+!define SUFFIX1 ""
+!endif
+!ifdef NOUTILS
+!define SUFFIX2 "-noutils"
+!else
+!define SUFFIX2 ""
+!endif
 ; build dirs
 !define BUILDDIR "build"
+!ifndef OUTDIR
 !define OUTDIR "${BUILDDIR}\installer"
+!endif
 !define GIPDIR "${BUILDDIR}\get_iplayer\get_iplayer-${VERSION}"
 !define PERLDIR "${BUILDDIR}\perl\perl-5.24.1"
 !define UTILSDIR "utils"
@@ -29,7 +45,7 @@
 BrandingText "${PRODUCT} ${WINVERSION}"
 InstallDir "$PROGRAMFILES\${PRODUCT}"
 Name "${PRODUCT}"
-OutFile "${OUTDIR}\${PRODUCT}-${WINVERSION}-installer.exe"
+OutFile "${OUTDIR}\${PRODUCT}-${WINVERSION}${SUFFIX}${SUFFIX1}${SUFFIX2}.exe"
 RequestExecutionLevel admin
 SetCompressor /SOLID lzma
 VIAddVersionKey "FileDescription" "${PRODUCT} ${WINVERSION}"
