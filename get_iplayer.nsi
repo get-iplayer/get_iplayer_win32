@@ -596,15 +596,16 @@ Section "-get_iplayer"
 	File get_iplayer_pvr.cmd
 	; start menu
 	File ${MUI_ICON}
+	File get_iplayer_pvr.ico
 	CreateDirectory "$SMDirMain"
 	CreateShortCut "$SMDirMain\get_iplayer.lnk" "$SYSDIR\cmd.exe" \
 		"/k get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help" "$INSTDIR\${MUI_ICON}"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\get_iplayer.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	CreateShortCut "$SMDirMain\Web PVR Manager.lnk" "$SYSDIR\cmd.exe" \
-		"/c get_iplayer_web_pvr.cmd" "$INSTDIR\${MUI_ICON}"
+		"/c get_iplayer_web_pvr.cmd" "$INSTDIR\get_iplayer_pvr.ico"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\Web PVR Manager.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	CreateShortCut "$SMDirMain\Run PVR Scheduler.lnk" "$SYSDIR\cmd.exe" \
-		"/k get_iplayer_pvr.cmd" "$INSTDIR\${MUI_ICON}"
+		"/k get_iplayer_pvr.cmd" "$INSTDIR\get_iplayer_pvr.ico"
 	ShellLink::SetShortCutWorkingDirectory "$SMDirMain\Run PVR Scheduler.lnk" "%HOMEDRIVE%%HOMEPATH%"
 	; help
 	CreateDirectory "$SMDirHelp"
@@ -695,6 +696,7 @@ Section "Uninstall"
 	Delete "$INSTDIR\get_iplayer_pvr.cmd"
 	; start menu
 	Delete "$INSTDIR\${MUI_ICON}"
+	Delete "$INSTDIR\get_iplayer_pvr.ico"
 	Delete "$SMDirMain\get_iplayer.lnk"
 	Delete "$SMDirMain\Web PVR Manager.lnk"
 	Delete "$SMDirMain\Run PVR Scheduler.lnk"
