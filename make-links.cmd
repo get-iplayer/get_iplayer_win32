@@ -8,7 +8,7 @@ set GIPDIR=%BUILDDIR%\get_iplayer\get_iplayer-3.06
 set PERLDIR=%BUILDDIR%\perl\perl-5.24.1
 set UTILSDIR=%CMDDIR%\utils
 set ATOMICPARSLEYDIR=%UTILSDIR%\AtomicParsley-0.9.6
-set FFMPEGDIR=%UTILSDIR%\ffmpeg-3.3.3-win32-static
+set FFMPEGDIR=%UTILSDIR%\ffmpeg-3.4-win32-static
 del /q "%CMDDIR%\get_iplayer.pl"
 del /q "%CMDDIR%\get_iplayer.cgi"
 rd /q "%CMDDIR%\perl"

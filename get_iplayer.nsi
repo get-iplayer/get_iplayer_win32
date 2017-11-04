@@ -38,7 +38,7 @@
 !define PERLDIR "${BUILDDIR}\perl\perl-5.24.1"
 !define UTILSDIR "utils"
 !define ATOMICPARSLEYDIR "${UTILSDIR}\AtomicParsley-0.9.6"
-!define FFMPEGDIR "${UTILSDIR}\ffmpeg-3.3.3-win32-static"
+!define FFMPEGDIR "${UTILSDIR}\ffmpeg-3.4-win32-static"
 ; registry key for uninstall info
 !define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT}"
 
@@ -615,9 +615,11 @@ Section "-get_iplayer"
 	File sources.txt
 	SetOutPath "$INSTDIR\utils\licenses\atomicparsley"
 	File "${ATOMICPARSLEYDIR}\COPYING"
-	SetOutPath "$INSTDIR\utils\licenses\ffmpeg"
-	File "${FFMPEGDIR}\README.txt"
-	File "${FFMPEGDIR}\licenses\*.*"
+	${If} ${AtLeastWin7}
+		SetOutPath "$INSTDIR\utils\licenses\ffmpeg"
+		File "${FFMPEGDIR}\README.txt"
+		File "${FFMPEGDIR}\LICENSE.txt"
+	${EndIf}
 	SetOutPath $INSTDIR
 !endif
 	WriteINIStr "$SMDirHelp\AtomicParsley Documentation.url" "InternetShortcut" "URL" "${ATOMICPARSLEYDOC}"
