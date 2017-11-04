@@ -712,7 +712,15 @@ Section "Uninstall"
 	Delete "$SMDirHelp\Strawberry Perl Home.url"
 !ifndef NOUTILS
 	; utils
-	RMDir /r "$INSTDIR\utils"
+	RMDir /r "$INSTDIR\utils\licenses\atomicparsley"
+	Delete "$INSTDIR\utils\AtomicParsley.exe"
+	${If} ${AtLeastWin7}
+		RMDir /r "$INSTDIR\utils\licenses\ffmpeg"
+		Delete "$INSTDIR\utils\ffmpeg.exe"
+	${EndIf}
+	RMDir "$INSTDIR\utils\licenses"
+	Delete "$INSTDIR\utils\sources.txt"
+	RMDir "$INSTDIR\utils"
 !endif
 	Delete "$SMDirHelp\AtomicParsley Documentation.url"
 	Delete "$SMDirHelp\FFmpeg Documentation.url"
