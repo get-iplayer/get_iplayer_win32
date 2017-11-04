@@ -2,6 +2,10 @@
 ;# Configuration
 ;#######################################
 
+; !define NOPERL
+; !define NOUTILS
+; !define TESTERRORS
+
 ; name and version
 !define PRODUCT "get_iplayer"
 !ifndef VERSION
@@ -30,7 +34,7 @@
 !ifndef OUTDIR
 !define OUTDIR "${BUILDDIR}\installer"
 !endif
-!define GIPDIR "${BUILDDIR}\get_iplayer\get_iplayer-${VERSION}"
+!define GIPDIR "${BUILDDIR}\get_iplayer\get_iplayer-${WINVERSION}"
 !define PERLDIR "${BUILDDIR}\perl\perl-5.24.1"
 !define UTILSDIR "utils"
 !define ATOMICPARSLEYDIR "${UTILSDIR}\AtomicParsley-0.9.6"
@@ -513,6 +517,8 @@ Function UserCleanup
 			IntOp $ErrNum $ErrNum + 1
 		${EndIf}
 	${EndIf}
+    ; set message for results page
+    ; StrCpy $Results "${RESULTS}"
 FunctionEnd
 
 ;#######################################

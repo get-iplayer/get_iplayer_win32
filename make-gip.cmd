@@ -47,7 +47,11 @@ if "%ARG2:~0,1%"=="/" (
 	call :log ERROR: setup build number cannot be flag parameter
 	goto die
 )
-set GIPVER=v%ARG1%
+if "%ARG1%"=="9.99" (
+    set GIPVER=master
+) else (
+    set GIPVER=v%ARG1%
+)
 set COIVER=%ARG1%.%ARG2%
 call :log get_iplayer version: %GIPVER%
 call :log setup version: %COIVER%
