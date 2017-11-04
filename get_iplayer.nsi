@@ -307,12 +307,21 @@ FunctionEnd
 Function InstCleanup
 	; remove items obsolete in 4.3+
 	RMDir /r "$INSTDIR\rtmpdump-2.2d"
-	RMDir /r "$INSTDIR\Downloads"
+	RMDir "$INSTDIR\Downloads"
 	Delete "$INSTDIR\linuxcentre.url"
 	Delete "$INSTDIR\get_iplayer_setup.nsi"
 	Delete "$INSTDIR\update_get_iplayer.cmd"
 	Delete "$INSTDIR\get_iplayer.cgi.old"
 	Delete "$INSTDIR\get_iplayer.pl.old"
+	; incomplete uninstallers before 4.6
+	Delete "$INSTDIR\update_get_iplayer.cmd"
+	Delete "$SMDirMain\Recordings Folder.lnk"
+	Delete "$SMDirMain\Run PVR Scheduler Now.lnk"
+	Delete "$SMDirMain\Uninstall Components.lnk"
+	Delete "$SMDirHelp\*.lnk"
+	RMDir "$SMDirHelp"
+	RMDir /r "$SMDirMain\Updates"
+	RMDir "$SMDirMain"
 	; clean up obsolete items in 2.95.0+
 	; remove old batch files
 	Delete "$INSTDIR\get_iplayer--pvr.bat"
