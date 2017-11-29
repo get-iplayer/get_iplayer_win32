@@ -9,10 +9,10 @@
 ; name and version
 !define PRODUCT "get_iplayer"
 !ifndef VERSION
-!define VERSION "9.99"
+!define VERSION "3.07"
 !endif
 !ifndef PATCHLEVEL
-!define PATCHLEVEL "9"
+!define PATCHLEVEL "0"
 !endif
 !define WINVERSION "${VERSION}.${PATCHLEVEL}"
 ; copy get_iplayer scripts and set version strings
