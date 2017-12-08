@@ -1,6 +1,5 @@
 #pragma parseroption -p-
 ; #define DUMPISPP
-; #define CLEANUP
 ; #define NOPERL
 ; #define NOUTILS
 #ifndef GiPVersion
@@ -12,9 +11,6 @@
 #expr Exec("make-gip.cmd", GiPVersion + ' ' + SetupBuild, SourcePath, 1, SW_HIDE)
 #define SetupDir "build\\setup"
 #define SetupSuffix '-setup'
-#ifdef CLEANUP
-  #define SetupSuffix SetupSuffix + '-cleanup'
-#endif
 #ifdef NOPERL
   #define SetupSuffix SetupSuffix + '-noperl'
 #endif
@@ -65,86 +61,12 @@ UninstallDisplayIcon={app}\get_iplayer_uninst.ico
 Name: desktopicons; Description: Create &desktop shortcuts (for all users); Flags: unchecked;
 
 [InstallDelete]
-#ifdef CLEANUP
-; removed in 4.3
-Type: files; Name: {app}\linuxcentre.url;
-Type: files; Name: {app}\get_iplayer_setup.nsi;
-Type: files; Name: {app}\update_get_iplayer.cmd;
-Type: files; Name: {app}\get_iplayer.cgi.old;
-Type: files; Name: {app}\get_iplayer.pl.old;
-Type: filesandordirs; Name: {app}\rtmpdump-2.2d;
-Type: dirifempty; Name: {app}\Downloads;
-; incomplete uninstallers before 4.6
-Type: files; Name: {app}\update_get_iplayer.cmd;
-Type: files; Name: {group}\Recordings Folder.lnk;
-Type: files; Name: {group}\Run PVR Scheduler Now.lnk;
-Type: files; Name: {group}\Uninstall Components.lnk;
-Type: files; Name: {group}\Help\*.lnk;
-Type: dirifempty; Name: {group}\Help;
-Type: filesandordirs; Name: {group}\Updates;
-Type: dirifempty; Name: {group};
-; removed in 2.95.0
-#define RemoveHelper(str HelperName) \
-'Type: files; Name: {app}\\' + HelperName + '.zip;' + "\n" + \
-'Type: files; Name: {app}\\' + HelperName + '_docs.url;' + "\n" + \
-'Type: filesandordirs; Name: {app}\\' + HelperName + ';'
-{#RemoveHelper("AtomicParsley")}
-{#RemoveHelper("FFmpeg")}
-{#RemoveHelper("LAME")}
-{#RemoveHelper("MPlayer")}
-{#RemoveHelper("RTMPDump")}
-{#RemoveHelper("VLC")}
-Type: files; Name: {app}\get_iplayer--pvr.bat;
-Type: files; Name: {app}\run_pvr_scheduler.bat;
-Type: files; Name: {app}\get_iplayer_docs.url;
-Type: files; Name: {app}\get_iplayer_examples.url;
-Type: files; Name: {app}\get_iplayer_home.url;
-Type: files; Name: {app}\command_examples.url;
-Type: files; Name: {app}\nsis_docs.url;
-Type: files; Name: {app}\strawberry_docs.url;
-Type: files; Name: {app}\download_latest_installer.url;
-Type: files; Name: {app}\pvr_manager.url;
-Type: files; Name: {app}\get_iplayer-ver.txt;
-Type: files; Name: {app}\get_iplayer-ver-check.txt;
-Type: files; Name: {app}\get_iplayer_config.ini;
-Type: files; Name: {app}\get_iplayer_config-check.ini;
-Type: files; Name: {app}\iplayer_logo.ico;
-Type: files; Name: {app}\perl.exe;
-Type: files; Name: {app}\*.dll;
-Type: filesandordirs; Name: {app}\lib;
-Type: filesandordirs; Name: {app}\perl-license;
-Type: files; Name: {userprograms}\VLC Media Player.lnk;
-Type: filesandordirs; Name: {userprograms}\get_iplayer;
-Type: files; Name: {commonappdata}\get_iplayer\options;
-Type: dirifempty; Name: {commonappdata}\get_iplayer;
-Type: files; Name: {app}\Uninst.exe;
-Type: files; Name: {code:VirtualStoreDir}\get_iplayer\get_iplayer*;
-Type: dirifempty; Name: {code:VirtualStoreDir}\get_iplayer;
-#define PluginsDir "{%USERPROFILE}\\.get_iplayer\\plugins"
-Type: files; Name: {#PluginsDir}\localfiles.plugin;
-Type: files; Name: {#PluginsDir}\localfiles.plugin.old;
-Type: files; Name: {#PluginsDir}\podcast.plugin;
-Type: files; Name: {#PluginsDir}\podcast.plugin.old;
-Type: files; Name: {#PluginsDir}\plugin.template;
-Type: dirifempty; Name: {#PluginsDir};
-; removed in 3.00.0
-Type: files; Name: {group}\Help\RTMPDump Documentation.url;
-Type: files; Name: {app}\utils\rtmpdump.exe;
-Type: filesandordirs; Name: {app}\utils\licenses\rtmpdump;
-; removed in 3.06.0
-Type: files; Name: {app}\pvr_manager.cmd;
-Type: files; Name: {app}\run_pvr_scheduler.cmd;
-Type: files; Name: {group}\Help\get_iplayer Examples.url;
-; removed in 3.07.0
-Type: files; Name: {app}\uninstall.exe;
-#else
 ; ensure removal of obsolete system options
 Type: files; Name: {commonappdata}\get_iplayer\options;
 Type: dirifempty; Name: {commonappdata}\get_iplayer;
 ; ensure removal of obsolete uninstallers
 Type: files; Name: {app}\Uninst.exe;
 Type: files; Name: {app}\uninstall.exe;
-#endif
 #ifndef NOPERL
 ; reset perl on install
 Type: filesandordirs; Name: {#PerlDir};
@@ -206,15 +128,6 @@ Name: {commondesktop}\Run PVR Scheduler; Filename: {cmd}; \
   IconFilename: {#GiPPVRIcon}; Tasks: desktopicons;
 Name: {commondesktop}\{#AppName} Documentation; Filename: {#GiPWiki};
 
-[Registry]
-#ifdef CLEANUP
-; removed in 2.95.0
-Root: HKCU; Subkey: Software\get_iplayer; ValueType: none; Flags: deletekey;
-; removed in 3.07.0
-Root: HKLM; Subkey: Software\Microsoft\Windows\CurrentVersion\Uninstall\get_iplayer; \
-  ValueType: none; Flags: deletekey;
-#endif
-
 [Run]
 Filename: {#GiPWiki}/releasenotes; Description: View {#AppName} release notes; \
   Flags: postinstall shellexec skipifsilent nowait;
@@ -229,90 +142,6 @@ Filename: {group}\Web PVR Manager.lnk; Description: Launch Web PVR Manager; \
 BeveledLabel={#SetupSetting('AppVerName')}
 
 [Code]
-#ifdef CLEANUP
-function VirtualStoreDir(Param: String): String;
-var
-  pf: String;
-begin
-  Log('VirtualStoreDir: enter');
-  pf := ExpandConstant('{pf}');
-  Log('VirtualStoreDir: pf=' + pf);
-  Result := ExpandConstant('{localappdata}\VirtualStore' +
-      Copy(pf, Length(ExtractFileDrive(pf)) + 1, MaxInt));
-  Log('VirtualStoreDir: exit=' + Result);
-end;
-
-function ConfigRead(ConfigFile, KeyName, DefaultValue: String): String;
-var
-  I: Integer;
-  KeyFull: String;
-  FileLines: TArrayOfString;
-begin
-  Result := DefaultValue;
-  if not LoadStringsFromFile(ConfigFile, FileLines) then
-    exit;
-  KeyFull := KeyName + ' ';
-  for I := 0 to GetArrayLength(FileLines) - 1 do
-  begin
-    FileLines[I] := TrimLeft(FileLines[I]);
-    if Pos(KeyFull, FileLines[I]) = 1 then
-    begin
-      Result := Copy(FileLines[I], Length(KeyFull) + 1, MaxInt);
-      Break;
-    end;
-  end;
-end;
-
-procedure TransferOutputDir();
-var
-  Prompt, ProfileDir, UserOptionsFile, UserOutputDir, SysOptionsFile, SysOutputDir: String;
-begin
-  Log('TransferOutputDir: enter');
-  ProfileDir := GetEnv('GETIPLAYERUSERPREFS');
-  if Length(ProfileDir) = 0 then
-    ProfileDir := ExpandConstant('{%USERPROFILE}\.get_iplayer');
-  Log('TransferOutputDir: ProfileDir=' + ProfileDir);
-  UserOptionsFile := AddBackslash(ProfileDir) + 'options';
-  Log('TransferOutputDir: UserOptionsFile=' + UserOptionsFile);
-  UserOutputDir := Trim(ConfigRead(UserOptionsFile, 'output', ''));
-  Log('TransferOutputDir: UserOutputDir=' + UserOutputDir);
-  if Length(UserOutputDir) > 0 then
-  begin
-    Log('TransferOutputDir: Custom output dir defined');
-    exit;
-  end;
-  SysOptionsFile := ExpandConstant('{commonappdata}\get_iplayer\options');
-  Log('TransferOutputDir: SysOptionsFile=' + SysOptionsFile);
-  SysOutputDir := Trim(ConfigRead(SysOptionsFile, 'output', ''));
-  Log('TransferOutputDir: SysOutputDir=' + SysOutputDir);
-  if (Length(SysOutputDir) = 0) or
-      (CompareText(RemoveBackslash(SysOutputDir),
-      ExpandConstant('{userdesktop}\iPlayer Recordings')) = 0) then
-  begin
-    Log('TransferOutputDir: Custom output dir not defined');
-    exit;
-  end;
-  if ForceDirectories(ProfileDir) then
-  begin
-    if SaveStringsToUTF8File(UserOptionsFile, ['output ' + SysOutputDir], True) then
-    begin
-      Log('TransferOutputDir: Transfer completed');
-      exit;
-    end
-    else
-      Log('TransferOutputDir: Could not write to options file');
-  end
-  else
-    Log('TransferOutputDir: Could not create profile dir');
-  Prompt := 'Setup was unable to transfer your previous custom output directory ' +
-      'configuration to your user preferences. You can reconfigure it after ' +
-      'installation with the following command:' + #13#10#13#10 +
-      '{#AppName} --prefs-add --output="' + SysOutputDir + '"';
-  SuppressibleMsgBox(Prompt, mbError, MB_OK, IDOK);
-  Log('TransferOutputDir: exit');
-end;
-
-#else
 function NSISUninstall(): Integer;
 var
   Uninstaller, Prompt: String;
@@ -383,7 +212,6 @@ begin
   Log(Format('NSISUninstall: exit=%d', [Result]));
 end;
 
-#endif
 function IsWindows7OrLater(): Boolean;
 begin
   Result := (GetWindowsVersion() >= $06010000);
@@ -418,16 +246,12 @@ begin
       exit;
     end;
   end;
-#ifdef CLEANUP
-  TransferOutputDir();
-#else
   RC := NSISUninstall();
   if RC = IDCANCEL then
   begin
     Result := 'Setup cancelled';
     exit;
   end;
-#endif
 end;
 
 function CopyLog(): Boolean;

@@ -49,7 +49,7 @@ REM location of Inno compiler
 set ISCC=C:\Program Files\Inno Setup 5\ISCC.exe
 REM build setup
 call :log Building setup...
-"%ISCC%" /DGiPVersion=%ARG1% /DSetupBuild=%ARG2% %CLEANUP% %NOPERL% %NOUTILS% /O"%OUTDIR%" "%CMDDIR%\get_iplayer.iss" >> "%LOG%" 2>&1
+"%ISCC%" /DGiPVersion=%ARG1% /DSetupBuild=%ARG2% %NOPERL% %NOUTILS% /O"%OUTDIR%" "%CMDDIR%\get_iplayer.iss" >> "%LOG%" 2>&1
 if %ERRORLEVEL% neq 0 (
 	call :log ERROR: %ISCC% failed
 	goto die
@@ -58,16 +58,13 @@ call :log ...Finished
 REM create checksums
 if "%NOHASH%"=="" (
 	call :log Creating checksum files...
-	if not "!CLEANUP!"=="" (
-		set CLEANUP=!CLEANUP:/D=-!
-	)
 	if not "!NOPERL!"=="" (
 		set NOPERL=!NOPERL:/D=-!
 	)
 	if not "!NOUTILS!"=="" (
 		set NOUTILS=!NOUTILS:/D=-!
 	)
-	for %%i in ( %OUTDIR%\get_iplayer-%ARG1%.%ARG2%-setup!CLEANUP!!NOPERL!!NOUTILS!.exe ) do (
+	for %%i in ( %OUTDIR%\get_iplayer-%ARG1%.%ARG2%-setup!NOPERL!!NOUTILS!.exe ) do (
 		if exist %%i (
 			for %%a in ( MD5, SHA1 ) do (
 				set HASH=
@@ -109,7 +106,6 @@ echo.
 echo Parameters:
 echo   GiPVersion - get_iplayer version (X.YY)
 echo   SetupBuild - setup build number (Z)
-echo   /CLEANUP - build with internal NSIS cleanup code
 echo   /NOPERL - omit Perl support library from build
 echo   /NOUTILS - omit helper utilities from build
 echo   /NOHASH - do not create checksum files
