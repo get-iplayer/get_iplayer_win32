@@ -8,6 +8,11 @@ REM script location
 set CMDNAME=%~n0
 set CMDDIR=%~dp0
 if #%CMDDIR:~-1%# == #\# set CMDDIR=%CMDDIR:~0,-1%
+REM determine parent directory
+for %%D in (%CMDDIR%\..) do (
+	set BASEDIR=%%~fD
+)
+if #%BASEDIR:~-1%# == #\# set BASEDIR=%BASEDIR:~0,-1%
 REM Perl build dir
 set PERLDIR=%CMDDIR%\build\perl
 if not exist "%PERLDIR%" (
@@ -120,7 +125,7 @@ if exist "%PARDIR%" (
 md "%PARDIR%" >> "%LOG%" 2>&1
 call :log Perl support files: %PARDIR%
 REM location of 7-Zip utility
-set P7ZIP=C:\Program Files\7-Zip\7z.exe
+set P7ZIP=%BASEDIR%\7-Zip\7z.exe
 REM unpack lib dir from PAR
 call :log Unpacking Perl library...
 "%P7ZIP%" x "%PARPAR%" -o"%PARDIR%" -aoa
@@ -137,8 +142,8 @@ copy /y "%PERLDIST%\c\bin\libiconv*.dll" "%PARDIR%" >> "%LOG%" 2>&1
 copy /y "%PERLDIST%\c\bin\libxml2*.dll" "%PARDIR%" >> "%LOG%" 2>&1
 copy /y "%PERLDIST%\c\bin\zlib*.dll" "%PARDIR%" >> "%LOG%" 2>&1
 copy /y "%PERLDIST%\c\bin\liblzma*.dll" "%PARDIR%" >> "%LOG%" 2>&1
-copy /y "%PERLDIST%\c\bin\libeay*.dll" "%PARDIR%" >> "%LOG%" 2>&1
-copy /y "%PERLDIST%\c\bin\ssleay*.dll" "%PARDIR%" >> "%LOG%" 2>&1
+copy /y "%PERLDIST%\c\bin\libcrypto*.dll" "%PARDIR%" >> "%LOG%" 2>&1
+copy /y "%PERLDIST%\c\bin\libssl*.dll" "%PARDIR%" >> "%LOG%" 2>&1
 REM patch Mozilla::CA
 copy /y "%PERLDIST%\perl\vendor\lib\Mozilla\CA.pm" "%PARDIR%\lib\Mozilla\CA.pm" >> "%LOG%" 2>&1
 perl -i.bak -p -e "s/__FILE__/\$INC\{\'Mozilla\/CA.pm\'\}/" "%PARDIR%\lib\Mozilla\CA.pm" >> "%LOG%" 2>&1

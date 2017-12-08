@@ -8,6 +8,11 @@ REM script location
 set CMDDIR=%~dp0
 set CMDNAME=%~n0
 if #%CMDDIR:~-1%# == #\# set CMDDIR=%CMDDIR:~0,-1%
+REM determine parent directory
+for %%D in (%CMDDIR%\..) do (
+	set BASEDIR=%%~fD
+)
+if #%BASEDIR:~-1%# == #\# set BASEDIR=%BASEDIR:~0,-1%
 REM Inno build dir
 set OUTDIR=%CMDDIR%\build\setup
 if not exist "%OUTDIR%" (
@@ -46,7 +51,7 @@ for %%A in (%*) do (
 	)
 )
 REM location of Inno compiler
-set ISCC=C:\Program Files\Inno Setup 5\ISCC.exe
+set ISCC=%BASEDIR%\Inno Setup 5\ISCC.exe
 REM build setup
 call :log Building setup...
 "%ISCC%" /DGiPVersion=%ARG1% /DSetupBuild=%ARG2% %NOPERL% %NOUTILS% /O"%OUTDIR%" "%CMDDIR%\get_iplayer.iss" >> "%LOG%" 2>&1
