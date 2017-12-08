@@ -23,7 +23,7 @@
 #define GiPWiki GiPRepo + "/wiki"
 #define GiPWin32Repo "https://github.com/get-iplayer/get_iplayer_win32"
 #define GiPSrc "build\\get_iplayer\\get_iplayer-" + AppVersion
-#define PerlSrc "build\\perl\\perl-5.24.1"
+#define PerlSrc "build\\perl\\perl-5.26.1"
 #define AtomicParsleySrc "utils\\AtomicParsley-0.9.6"
 #define FFmpegSrc "utils\\ffmpeg-3.4-win32-static"
 #define PerlDir "{app}\\perl"
