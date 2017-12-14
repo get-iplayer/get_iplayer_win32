@@ -126,7 +126,7 @@ Name: {commondesktop}\Web PVR Manager; Filename: {cmd}; \
 Name: {commondesktop}\Run PVR Scheduler; Filename: {cmd}; \
   Parameters: /k get_iplayer_pvr.cmd; WorkingDir: {#HomeDir}; \
   IconFilename: {#GiPPVRIcon}; Tasks: desktopicons;
-Name: {commondesktop}\{#AppName} Documentation; Filename: {#GiPWiki};
+Name: {commondesktop}\{#AppName} Documentation; Filename: {#GiPWiki}; Tasks: desktopicons;
 
 [Run]
 Filename: {#GiPWiki}/releasenotes; Description: View {#AppName} release notes; \
