@@ -449,6 +449,9 @@ var
 begin
 	// only run during actual uninstall
 	if CurUninstallStep = usUninstall then begin
+		// always remove from path
+		ModPath();
+		{
 		// get list of selected tasks saved in registry at install time
 		appid := '{#emit SetupSetting("AppId")}';
 		if appid = '' then appid := '{#emit SetupSetting("AppName")}';
@@ -467,6 +470,7 @@ begin
 				end;
 			end;
 		end;
+		}
 	end;
 end;
 
