@@ -137,10 +137,12 @@ Filename: {#GiPWiki}/releasenotes; Description: View {#AppName} release notes; \
   Flags: postinstall shellexec skipifsilent nowait;
 Filename: {group}\Help\{#AppName} Documentation.url; Description: View {#AppName} documentation; \
   Flags: postinstall shellexec skipifsilent nowait unchecked;
-Filename: {group}\{#AppName}.lnk; Description: Launch {#AppName}; \
-  Flags: postinstall shellexec skipifsilent nowait unchecked;
-Filename: {group}\Web PVR Manager.lnk; Description: Launch Web PVR Manager; \
-  Flags: postinstall shellexec skipifsilent nowait unchecked;
+Filename: {cmd}; Parameters: "/k ""set ""PATH=%PATH%;{app}"" && get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help"""; \
+  WorkingDir: {%HOMEDRIVE}{%HOMEPATH}; Description: Launch {#AppName};  \
+  Flags: postinstall skipifsilent nowait unchecked;
+Filename: {cmd}; Parameters: "/c ""set ""PATH=%PATH%;{app}"" && get_iplayer_web_pvr.cmd"""; \
+  WorkingDir: {%HOMEDRIVE}{%HOMEPATH}; Description: Launch Web PVR Manager; \
+  Flags: postinstall skipifsilent nowait unchecked;
 
 [Messages]
 BeveledLabel={#SetupSetting('AppVerName')}
