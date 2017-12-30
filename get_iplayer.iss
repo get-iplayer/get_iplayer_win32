@@ -91,7 +91,7 @@ Source: get_iplayer_pvr.ico; DestDir: {app};
 Source: get_iplayer_uninst.ico; DestDir: {app};
 Source: {#SetupSetting('LicenseFile')}; DestDir: {app};
 #ifndef NOPERL
-Source: {#PerlSrc}\*; DestDir: {#PerlDir}; Flags: recursesubdirs createallsubdirs;
+Source: {#PerlSrc}\*; Excludes: "\MANIFEST,\META.yml,\script"; DestDir: {#PerlDir}; Flags: recursesubdirs createallsubdirs;
 #endif
 #ifndef NOUTILS
 Source: sources.txt; DestDir: {#UtilsDir};
