@@ -3,10 +3,10 @@
 ; #define NOPERL
 ; #define NOUTILS
 #ifndef GiPVersion
-  #define GiPVersion "9.99"
+  #define GiPVersion "3.08"
 #endif
 #ifndef SetupBuild
-  #define SetupBuild "9"
+  #define SetupBuild "0"
 #endif
 #expr Exec("make-gip.cmd", GiPVersion + ' ' + SetupBuild, SourcePath, 1, SW_HIDE)
 #define SetupDir "build\\setup"
