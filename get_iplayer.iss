@@ -3,10 +3,10 @@
 ; #define NOPERL
 ; #define NOUTILS
 #ifndef GiPVersion
-  #define GiPVersion "9.99"
+  #define GiPVersion "3.10"
 #endif
 #ifndef SetupBuild
-  #define SetupBuild "9"
+  #define SetupBuild "0"
 #endif
 #expr Exec("make-gip.cmd", GiPVersion + ' ' + SetupBuild, SourcePath, 1, SW_HIDE)
 #define SetupDir "build\\setup"
@@ -322,7 +322,7 @@ end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
-	if CurUninstallStep = usUninstall then
+  if CurUninstallStep = usUninstall then
   begin
     PathCheck(ExpandConstant('{app}'));
   end;
