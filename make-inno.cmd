@@ -82,7 +82,7 @@ if "%NOHASH%"=="" (
 					if "!HASH!"=="" (
 						set HASH=%%#
 						set HASH=!HASH: =!
-						echo !HASH!  %%~nxi > %%~fi.!ALGO!
+						echo !HASH! %%~nxi > %%~fi.!ALGO!
 					)
 				)
 			)
