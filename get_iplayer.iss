@@ -8,7 +8,7 @@
 #ifndef SetupBuild
   #define SetupBuild "9"
 #endif
-#expr Exec("make-gip.cmd", GiPVersion + ' ' + SetupBuild, SourcePath, 1, SW_HIDE)
+; #expr Exec("make-gip.cmd", GiPVersion + ' ' + SetupBuild, SourcePath, 1, SW_HIDE)
 #define SetupDir "build\\setup"
 #define SetupSuffix '-setup'
 #ifdef NOPERL
