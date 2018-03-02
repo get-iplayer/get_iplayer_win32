@@ -61,12 +61,28 @@ if exist "%COIDIR%" (
 	rd /q /s "%COIDIR%" >> "%LOG%" 2>&1
 )
 md "%COIDIR%" >> "%LOG%" 2>&1
-REM checkout version in repo
-"%GIT%" --git-dir="%REPO%\.git" --work-tree="%REPO%" checkout %GIPVER% >> "%LOG%" 2>&1
+REM checkout master branch in repo
+"%GIT%" --git-dir="%REPO%\.git" --work-tree="%REPO%" checkout master >> "%LOG%" 2>&1
 REM check result
 if %ERRORLEVEL% neq 0 (
-	call :log ERROR: checkout %GIPVER% failed
+	call :log ERROR: checkout master failed
 	goto die
+)
+REM pull latest into master from tracked remote branch
+"%GIT%" --git-dir="%REPO%\.git" --work-tree="%REPO%" pull --tags >> "%LOG%" 2>&1
+REM check result
+if %ERRORLEVEL% neq 0 (
+	call :log ERROR: pull failed
+	goto die
+)
+if not "%GIPVER%"=="master" (
+	REM checkout release version in repo
+	"%GIT%" --git-dir="%REPO%\.git" --work-tree="%REPO%" checkout %GIPVER% >> "%LOG%" 2>&1
+	REM check result
+	if %ERRORLEVEL% neq 0 (
+		call :log ERROR: checkout %GIPVER% failed
+		goto die
+	)
 )
 REM use checkout-index to copy files to build dir
 "%GIT%" --git-dir="%REPO%\.git" checkout-index --prefix="%COIDIR%\\" get_iplayer get_iplayer.cgi LICENSE.txt >> "%LOG%" 2>&1
