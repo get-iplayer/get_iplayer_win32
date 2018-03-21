@@ -61,9 +61,6 @@ UninstallDisplayIcon={app}\get_iplayer_uninst.ico
 Name: desktopicons; Description: Create &desktop shortcuts (for all users); Flags: unchecked;
 
 [InstallDelete]
-; ensure removal of obsolete system options
-Type: files; Name: {commonappdata}\get_iplayer\options;
-Type: dirifempty; Name: {commonappdata}\get_iplayer;
 ; ensure removal of obsolete uninstallers
 Type: files; Name: {app}\Uninst.exe;
 Type: files; Name: {app}\uninstall.exe;
@@ -200,20 +197,26 @@ begin
     Prompt := Prompt + #13#10#13#10 + Format('ERROR: Code=%d Message=%s', [RC, SysErrorMessage(RC)]);
   end
   else
+  begin
     if RC <> 0 then
     begin
       Log(Format('NSISUninstall: uninstaller aborted: rc=%d', [RC]));
       Prompt := 'Uninstall of your previous version of {#AppName} was aborted.';
     end;
-  begin
   end;
   if RC <> 0 then
   begin
     Log('NSISUninstall: failed');
     Prompt := Prompt + #13#10#13#10 + 'Uninstall your previous version of {#AppName} ' +
-        'in Windows Control Panel and then re-run {#AppName} Setup.'
+        'in Windows Control Panel and then re-run {#AppName} Setup.';
     SuppressibleMsgBox(Prompt, mbError, MB_OK, IDOK);
     Result := IDCANCEL;
+  end
+  else
+  begin
+    // ensure removal of obsolete system options
+    DeleteFile(ExpandConstant('{commonappdata}\get_iplayer\options'));
+    RemoveDir(ExpandConstant('{commonappdata}\get_iplayer'));
   end;
   Log(Format('NSISUninstall: exit=%d', [Result]));
 end;
