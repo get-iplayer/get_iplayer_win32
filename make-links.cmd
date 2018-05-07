@@ -4,11 +4,11 @@ setlocal
 set CMDDIR=%~dp0
 if #%CMDDIR:~-1%# == #\# set CMDDIR=%CMDDIR:~0,-1%
 set BUILDDIR=%CMDDIR%\build
-set GIPDIR=%BUILDDIR%\get_iplayer\get_iplayer-3.13
+set GIPDIR=%BUILDDIR%\get_iplayer\get_iplayer-3.14
 set PERLDIR=%BUILDDIR%\perl\perl-5.26.1
 set UTILSDIR=%CMDDIR%\utils
 set ATOMICPARSLEYDIR=%UTILSDIR%\AtomicParsley-0.9.6
-set FFMPEGDIR=%UTILSDIR%\ffmpeg-3.4-win32-static
+set FFMPEGDIR=%UTILSDIR%\ffmpeg-4.0-win32-static
 del /q "%CMDDIR%\get_iplayer.pl"
 del /q "%CMDDIR%\get_iplayer.cgi"
 rd /q "%CMDDIR%\perl"

@@ -3,10 +3,10 @@
 ; #define NOPERL
 ; #define NOUTILS
 #ifndef GiPVersion
-  #define GiPVersion "9.99"
+  #define GiPVersion "3.14"
 #endif
 #ifndef SetupBuild
-  #define SetupBuild "9"
+  #define SetupBuild "0"
 #endif
 ; #expr Exec("make-gip.cmd", GiPVersion + ' ' + SetupBuild, SourcePath, 1, SW_HIDE)
 #define SetupDir "build\\setup"
@@ -25,7 +25,7 @@
 #define GiPSrc "build\\get_iplayer\\get_iplayer-" + AppVersion
 #define PerlSrc "build\\perl\\perl-5.26.1"
 #define AtomicParsleySrc "utils\\AtomicParsley-0.9.6"
-#define FFmpegSrc "utils\\ffmpeg-3.4-win32-static"
+#define FFmpegSrc "utils\\ffmpeg-4.0-win32-static"
 #define PerlDir "{app}\\perl"
 #define UtilsDir "{app}\\utils"
 #define LicensesDir UtilsDir + "\\licenses"
