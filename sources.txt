@@ -1,7 +1,11 @@
 AtomicParsley
 =============
-https://bitbucket.org/dinkypumpkin/atomicparsley
+
+https://bitbucket.org/wez/atomicparsley
+
 
 FFmpeg
 ======
-https://ffmpeg.zeranoe.com/builds/
+
+https://ffmpeg.zeranoe.com
+https://git.ffmpeg.org/gitweb/ffmpeg.git

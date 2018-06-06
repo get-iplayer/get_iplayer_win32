@@ -2,13 +2,18 @@
 ; #define DUMPISPP
 ; #define NOPERL
 ; #define NOUTILS
+#define AppName "get_iplayer"
 #ifndef GiPVersion
-  #define GiPVersion "9.99"
+  #define GiPVersion "0.00"
 #endif
-#ifndef SetupBuild
-  #define SetupBuild "9"
+#ifndef SetupPatch
+  #define SetupPatch "0"
 #endif
-; #expr Exec("make-gip.cmd", GiPVersion + ' ' + SetupBuild, SourcePath, 1, SW_HIDE)
+#define AppVersion GiPVersion + '.' + SetupPatch
+#define GiPSrc "build\\src\\get_iplayer"
+#define PerlSrc "build\\src\\perl"
+#define AtomicParsleySrc "build\\src\\atomicparsley"
+#define FFmpegSrc "build\\src\\ffmpeg"
 #define SetupDir "build\\setup"
 #define SetupSuffix '-setup'
 #ifdef NOPERL
@@ -17,21 +22,15 @@
 #ifdef NOUTILS
   #define SetupSuffix SetupSuffix + '-noutils'
 #endif
-#define AppName "get_iplayer"
-#define AppVersion GiPVersion + '.' + SetupBuild
-#define GiPRepo "https://github.com/get-iplayer/get_iplayer"
-#define GiPWiki GiPRepo + "/wiki"
-#define GiPWin32Repo "https://github.com/get-iplayer/get_iplayer_win32"
-#define GiPSrc "build\\get_iplayer\\get_iplayer-" + AppVersion
-#define PerlSrc "build\\perl\\perl-5.26.1"
-#define AtomicParsleySrc "utils\\AtomicParsley-0.9.6"
-#define FFmpegSrc "utils\\ffmpeg-4.0-win32-static"
 #define PerlDir "{app}\\perl"
 #define UtilsDir "{app}\\utils"
 #define LicensesDir UtilsDir + "\\licenses"
 #define GiPIcon "{app}\\get_iplayer.ico"
 #define GiPPVRIcon "{app}\\get_iplayer_pvr.ico"
 #define HomeDir "%HOMEDRIVE%%HOMEPATH%"
+#define GiPRepo "https://github.com/get-iplayer/get_iplayer"
+#define GiPWiki GiPRepo + "/wiki"
+#define GiPWin32Repo "https://github.com/get-iplayer/get_iplayer_win32"
 
 [Setup]
 AppCopyright=Copyright (C) 2008-2010 Phil Lewis
@@ -91,10 +90,10 @@ Source: {#SetupSetting('LicenseFile')}; DestDir: {app};
 Source: {#PerlSrc}\*; Excludes: "\MANIFEST,\META.yml,\script"; DestDir: {#PerlDir}; Flags: recursesubdirs createallsubdirs;
 #endif
 #ifndef NOUTILS
-Source: sources.txt; DestDir: {#UtilsDir};
+Source: sources.txt; DestDir: {#UtilsDir}
 Source: {#AtomicParsleySrc}\AtomicParsley.exe; DestDir: {#UtilsDir};
 Source: {#AtomicParsleySrc}\COPYING; DestDir: {#LicensesDir}\atomicparsley;
-Source: {#FFmpegSrc}\bin\ffmpeg.exe; DestDir: {#UtilsDir}; MinVersion: 6.1;
+Source: {#FFmpegSrc}\ffmpeg.exe; DestDir: {#UtilsDir}; MinVersion: 6.1;
 Source: {#FFmpegSrc}\LICENSE.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
 Source: {#FFmpegSrc}\README.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
 #endif
