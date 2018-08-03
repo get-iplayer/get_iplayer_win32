@@ -1,5 +1,5 @@
 # Build win32 installer for get_iplayer
-# Requires: Git for Windows w/Git Bash, Strawberry Perl w/gmake, Inno Setup
+# Requires: Git for Windows 32-bit w/Git Bash, Strawberry Perl 32-bit w/gmake, Inno Setup
 # Build release (VERSION = tag in get_iplayer repo w/o "v" prefix"):
 # VERSION=3.14 gmake release
 # Rebuild all dependencies and build release:
@@ -60,13 +60,15 @@ atomicparsley_zip_url := https://bitbucket.org/dinkypumpkin/atomicparsley/downlo
 build_atomicparsley := $(build)
 build_atomicparsley_zip := $(build_atomicparsley)/$(atomicparsley_zip)
 src_atomicparsley := $(src)/atomicparsley
-ffmpeg_zip := ffmpeg-4.0-win32-static.zip
+ffmpeg_zip := ffmpeg-4.0.2-win32-static.zip
 ffmpeg_zip_url := https://ffmpeg.zeranoe.com/builds/win32/static/$(ffmpeg_zip)
 build_ffmpeg := $(build)
 build_ffmpeg_zip := $(build_ffmpeg)/$(ffmpeg_zip)
 src_ffmpeg := $(src)/ffmpeg
-iscc_inst := /c/Program Files/Inno Setup 5
+prog_files := $(shell echo $$PROGRAMFILES)
+iscc_inst := $(prog_files)/Inno Setup 5
 iscc := $(iscc_inst)/ISCC.exe
+gip_inst := $(prog_files)/$(setup_name)
 def_version := $(shell awk '/\#define GiPVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
 def_patch := $(shell awk '/\#define SetupPatch/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
 
@@ -192,7 +194,10 @@ commit:
 ifndef WIP
 	@git commit -m "$(setup_ver)" "$(setup_src)"
 	@git tag $(setup_ver)
+	@git checkout contribute
+	@git merge master
 	@git revert --no-edit HEAD
+	@git checkout master
 	@echo tagged $(setup_ver)
 else
 	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(def_version)"/' \
@@ -201,7 +206,8 @@ else
 endif
 
 clean:
-	@rm -f "$(build_setup)/$(setup_file)"*
+	@rm -f "$(build_setup)/$(setup_file)"
+	@rm -f "$(build_setup)/$(setup_file)".{md5,sha1}
 	@echo removed $(build_setup)/$(setup_file)
 	@rm -fr "$(src)"
 	@echo removed $(src)
@@ -218,5 +224,5 @@ install:
 	@echo installed
 
 uninstall:
-	@"/c/Program Files/$(setup_name)/unins000.exe" //VERYSILENT //SUPPRESSMSGBOXES
+	@"$(gip_inst)/unins000.exe" //VERYSILENT //SUPPRESSMSGBOXES
 	@echo uninstalled
