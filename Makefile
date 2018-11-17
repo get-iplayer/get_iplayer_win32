@@ -56,11 +56,11 @@ src_perl := $(src)/perl
 pp := $(perl_inst)/perl/site/bin/pp
 pp_mods := -M Encode::Byte -M JSON -M JSON::XS -M JSON::PP -M Mojolicious -M XML::LibXML -M XML::LibXML::SAX -M XML::LibXML::SAX::Parser -M XML::SAX::PurePerl -M XML::SAX::Expat -M XML::Parser
 atomicparsley_zip := AtomicParsley-0.9.6-win32-bin.zip
-atomicparsley_zip_url := https://bitbucket.org/dinkypumpkin/atomicparsley/downloads/$(atomicparsley_zip)
+atomicparsley_zip_url := https://sourceforge.net/projects/get-iplayer/files/utils/$(atomicparsley_zip)
 build_atomicparsley := $(build)
 build_atomicparsley_zip := $(build_atomicparsley)/$(atomicparsley_zip)
 src_atomicparsley := $(src)/atomicparsley
-ffmpeg_zip := ffmpeg-4.0.2-win32-static.zip
+ffmpeg_zip := ffmpeg-4.1-win32-static.zip
 ffmpeg_zip_url := https://ffmpeg.zeranoe.com/builds/win32/static/$(ffmpeg_zip)
 build_ffmpeg := $(build)
 build_ffmpeg_zip := $(build_ffmpeg)/$(ffmpeg_zip)
@@ -69,8 +69,10 @@ prog_files := $(shell echo $$PROGRAMFILES)
 iscc_inst := $(prog_files)/Inno Setup 5
 iscc := $(iscc_inst)/ISCC.exe
 gip_inst := $(prog_files)/$(setup_name)
-def_version := $(shell awk '/\#define GiPVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
-def_patch := $(shell awk '/\#define SetupPatch/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
+curr_version := $(shell awk '/\#define GiPVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
+curr_patch := $(shell awk '/\#define SetupPatch/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
+next_version := $(VERSION)
+next_patch := $(shell expr $(PATCH) + 1)
 
 dummy:
 	@echo Nothing to make
@@ -196,12 +198,14 @@ ifndef WIP
 	@git tag $(setup_ver)
 	@git checkout contribute
 	@git merge master
-	@git revert --no-edit HEAD
+	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(next_version)"/' \
+		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(next_patch)"/' $(setup_src)
+	@git commit -m "bump dev version" "$(setup_src)"
 	@git checkout master
 	@echo tagged $(setup_ver)
 else
-	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(def_version)"/' \
-		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(def_patch)"/' $(setup_src)
+	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(curr_version)"/' \
+		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(curr_patch)"/' $(setup_src)
 	@rm -f $(setup_src).bak
 endif
 

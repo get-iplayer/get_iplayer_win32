@@ -230,7 +230,7 @@ var
   Prompt: String;
 begin
   Result := IDOK;
-  Prompt := 'NOTE: {#AppName} is not supported by the developer for use on Windows XP or Vista. ' +
+  Prompt := 'NOTE: {#AppName} is not supported by the developers for use on Windows XP or Vista. ' +
       'Windows 7 is the minimum version required by the bundled version of ffmpeg. ' +
       'ffmpeg is not required to download programmes, but it is required to convert ' +
       'output files to MP4 and to add metadata tags. If you wish to use get_iplayer ' +
