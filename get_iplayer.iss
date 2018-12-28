@@ -7,7 +7,7 @@
   #define GiPVersion "3.18"
 #endif
 #ifndef SetupPatch
-  #define SetupPatch "0"
+  #define SetupPatch "1"
 #endif
 #define AppVersion GiPVersion + '.' + SetupPatch
 #define GiPSrc "build\\src\\get_iplayer"
