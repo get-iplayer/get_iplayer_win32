@@ -4,10 +4,10 @@
 ; #define NOUTILS
 #define AppName "get_iplayer"
 #ifndef GiPVersion
-  #define GiPVersion "3.18"
+  #define GiPVersion "0.00"
 #endif
 #ifndef SetupPatch
-  #define SetupPatch "1"
+  #define SetupPatch "0"
 #endif
 #define AppVersion GiPVersion + '.' + SetupPatch
 #define GiPSrc "build\\src\\get_iplayer"

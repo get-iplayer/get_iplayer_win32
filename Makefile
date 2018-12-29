@@ -71,8 +71,6 @@ iscc := $(iscc_inst)/ISCC.exe
 gip_inst := $(prog_files)/$(setup_name)
 curr_version := $(shell awk '/\#define GiPVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
 curr_patch := $(shell awk '/\#define SetupPatch/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
-next_version := $(VERSION)
-next_patch := $(shell expr $(PATCH) + 1)
 
 dummy:
 	@echo Nothing to make
@@ -198,15 +196,16 @@ ifndef WIP
 	@git tag $(setup_ver)
 	@git checkout contribute
 	@git merge master
-	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(next_version)"/' \
-		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(next_patch)"/' $(setup_src)
-	@git commit -m "bump dev version" "$(setup_src)"
+	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(curr_version)"/' \
+		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(curr_patch)"/' $(setup_src)
+	@rm -f "$(setup_src).bak"
+	@git commit -m "revert dev version" "$(setup_src)"
 	@git checkout master
 	@echo tagged $(setup_ver)
 else
 	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(curr_version)"/' \
 		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(curr_patch)"/' $(setup_src)
-	@rm -f $(setup_src).bak
+	@rm -f "$(setup_src).bak"
 endif
 
 clean:
