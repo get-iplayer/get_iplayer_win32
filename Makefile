@@ -60,7 +60,7 @@ atomicparsley_zip_url := https://sourceforge.net/projects/get-iplayer/files/util
 build_atomicparsley := $(build)
 build_atomicparsley_zip := $(build_atomicparsley)/$(atomicparsley_zip)
 src_atomicparsley := $(src)/atomicparsley
-ffmpeg_zip := ffmpeg-4.1-win32-static.zip
+ffmpeg_zip := ffmpeg-4.1.1-win32-static.zip
 ffmpeg_zip_url := https://ffmpeg.zeranoe.com/builds/win32/static/$(ffmpeg_zip)
 build_ffmpeg := $(build)
 build_ffmpeg_zip := $(build_ffmpeg)/$(ffmpeg_zip)
@@ -178,6 +178,7 @@ ifndef NOSETUP
 	@pushd $(build_setup); \
 		md5sum $(setup_file) > $(setup_file).md5 || exit 6; \
 		sha1sum $(setup_file) > $(setup_file).sha1 || exit 6; \
+		sha256sum $(setup_file) > $(setup_file).sha256 || exit 6; \
 	popd
 	@echo built $(build_setup)/$(setup_file)
 endif
