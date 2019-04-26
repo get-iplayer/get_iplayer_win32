@@ -60,6 +60,8 @@ UninstallDisplayIcon={app}\get_iplayer_uninst.ico
 Name: desktopicons; Description: Create &desktop shortcuts (for all users); Flags: unchecked;
 
 [InstallDelete]
+; remove obsolete files
+Type: files; Name: {app}\get_iplayer.cgi.cmd;
 ; ensure removal of obsolete uninstallers
 Type: files; Name: {app}\Uninst.exe;
 Type: files; Name: {app}\uninstall.exe;
@@ -79,7 +81,7 @@ Type: files; Name: {app}\Setup Log*;
 Source: {#GiPSrc}\get_iplayer; DestDir: {app}; DestName: get_iplayer.pl;
 Source: {#GiPSrc}\get_iplayer.cgi; DestDir: {app};
 Source: get_iplayer.cmd; DestDir: {app};
-Source: get_iplayer.cgi.cmd; DestDir: {app};
+Source: get_iplayer_cgi.cmd; DestDir: {app};
 Source: get_iplayer_web_pvr.cmd; DestDir: {app};
 Source: get_iplayer_pvr.cmd; DestDir: {app};
 Source: get_iplayer.ico; DestDir: {app};
