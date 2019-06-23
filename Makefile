@@ -211,7 +211,7 @@ endif
 
 clean:
 	@rm -f "$(build_setup)/$(setup_file)"
-	@rm -f "$(build_setup)/$(setup_file)".{md5,sha1}
+	@rm -f "$(build_setup)/$(setup_file)".{md5,sha1,sha256}
 	@echo removed $(build_setup)/$(setup_file)
 	@rm -fr "$(src)"
 	@echo removed $(src)
