@@ -63,6 +63,7 @@ Name: desktopicons; Description: Create &desktop shortcuts (for all users); Flag
 ; remove obsolete files
 Type: files; Name: {app}\get_iplayer.cgi.cmd;
 Type: filesandordirs; Name: {group}\Update;
+Type: files; Name: {group}\Uninstall.lnk;
 ; ensure removal of obsolete uninstallers
 Type: files; Name: {app}\Uninst.exe;
 Type: files; Name: {app}\uninstall.exe;
@@ -109,7 +110,7 @@ Name: {group}\Web PVR Manager; Filename: {cmd}; \
   Parameters: /c get_iplayer_web_pvr.cmd; WorkingDir: {#HomeDir}; IconFilename: {#GiPPVRIcon};
 Name: {group}\Run PVR Scheduler; Filename: {cmd}; \
   Parameters: /k get_iplayer_pvr.cmd; WorkingDir: {#HomeDir}; IconFilename: {#GiPPVRIcon};
-Name: {group}\Uninstall; Filename: {uninstallexe}; IconFilename: {#SetupSetting('UninstallDisplayIcon')};
+Name: {group}\Uninstall {#AppName}; Filename: {uninstallexe}; IconFilename: {#SetupSetting('UninstallDisplayIcon')};
 Name: {group}\Help\{#AppName} Documentation; Filename: {#GiPWiki};
 Name: {group}\Help\AtomicParsley Documentation; Filename: http://atomicparsley.sourceforge.net;
 Name: {group}\Help\FFmpeg Documentation; Filename: http://ffmpeg.org/documentation.html;
