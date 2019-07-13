@@ -62,6 +62,7 @@ Name: desktopicons; Description: Create &desktop shortcuts (for all users); Flag
 [InstallDelete]
 ; remove obsolete files
 Type: files; Name: {app}\get_iplayer.cgi.cmd;
+Type: filesandordirs; Name: {group}\Update;
 ; ensure removal of obsolete uninstallers
 Type: files; Name: {app}\Uninst.exe;
 Type: files; Name: {app}\uninstall.exe;
@@ -114,7 +115,10 @@ Name: {group}\Help\AtomicParsley Documentation; Filename: http://atomicparsley.s
 Name: {group}\Help\FFmpeg Documentation; Filename: http://ffmpeg.org/documentation.html;
 Name: {group}\Help\Perl Documentation; Filename: http://perldoc.perl.org;
 Name: {group}\Help\Strawberry Perl Home; Filename: http://strawberryperl.com;
-Name: {group}\Update\Check for Update; Filename: {#SetupSetting('AppUpdatesURL')};
+Name: {group}\Check for Update; Filename: {cmd}; \
+  Parameters: /k get_iplayer.cmd --release-check; \
+  WorkingDir: {#HomeDir}; IconFilename: {#SetupSetting('UninstallDisplayIcon')};
+Name: {group}\Download {#AppName}; Filename: {#SetupSetting('AppUpdatesURL')};
 Name: {commondesktop}\{#AppName}; Filename: {cmd}; \
   Parameters: /k get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help; \
   WorkingDir: {#HomeDir}; IconFilename: {#GiPIcon}; Tasks: desktopicons;
