@@ -1,15 +1,17 @@
 # Build win32 installer for get_iplayer
-# Requires: Git for Windows 32-bit w/Git Bash, Strawberry Perl 32-bit w/gmake, Inno Setup
+# Requires: Git for Windows 32-bit w/Git Bash, MSYS make 32-bit, Strawberry Perl 32-bit w/64-bit int, PAR::Packer, Inno Setup
+# Requires: Download http://repo.msys2.org/msys/i686/make-4.2.1-1-i686.pkg.tar.xz
+# Requires: Extract make.exe and place in $PROGRAMFILES\Git\usr\bin
 # Build release (VERSION = tag in get_iplayer repo w/o "v" prefix"):
-# VERSION=3.14 gmake release
+# VERSION=3.14 make release
 # Rebuild all dependencies and build release:
-# VERSION=3.14 gmake distclean release
+# VERSION=3.14 make distclean release
 # Specify installer patch number for release (default = 0):
-# VERSION=3.14 PATCH=1 gmake release
+# VERSION=3.14 PATCH=1 make release
 # Flag as work in progress for development
-# VERSION=3.14 PATCH=1 WIP=1 gmake release
+# VERSION=3.14 PATCH=1 WIP=1 make release
 # Use alternate tag/branch in get_iplayer repo
-# VERSION=3.14 PATCH=1 WIP=1 TAG=develop gmake release
+# VERSION=3.14 PATCH=1 WIP=1 TAG=develop make release
 
 ifndef VERSION
 	gip_tag := master
@@ -47,26 +49,36 @@ build_gip := $(build)
 build_gip_zip := $(build_gip)/$(gip_zip)
 src_gip := $(src)/get_iplayer
 gip_repo := ../get_iplayer
-perl_inst := /c/Strawberry
-perl := $(perl_inst)/perl/bin/perl
-perl_ver := $(shell "$(perl)" -e 'print $$^V')
+perl_ver := 5.30.1
+perl_tag := $(perl_ver).1
 build_perl := $(build)
-build_perl_par := $(build_perl)/perl-$(perl_ver).par
+perl_base := strawberry-perl-$(perl_tag)-32bit-portable
+perl_inst := $(build_perl)/$(perl_base)
+perl := $(perl_inst)/portableshell.bat
+perl_vendor_lib = $(perl_inst)/perl/vendor/lib
+perl_zip := $(perl_base).zip
+perl_zip_url := http://strawberryperl.com/download/$(perl_tag)/$(perl_zip)
+build_perl_zip := $(build_perl)/$(perl_zip)
+build_perl_par := $(build_perl)/perl-$(perl_tag).par
 src_perl := $(src)/perl
+cpanm := $(perl_inst)/perl/bin/cpanm
+cpanm_args := -n
+cpanm_mods := PAR::Packer
 pp := $(perl_inst)/perl/site/bin/pp
-pp_mods := -M Encode::Byte -M JSON -M JSON::XS -M JSON::PP -M Mojolicious -M XML::LibXML -M XML::LibXML::SAX -M XML::LibXML::SAX::Parser -M XML::SAX::PurePerl -M XML::SAX::Expat -M XML::Parser
+pp_mods := -M Encode::Byte -M JSON -M JSON::XS -M JSON::PP -M Mojolicious -M XML::LibXML -M XML::LibXML::SAX -M XML::LibXML::SAX::Parser -M XML::SAX::PurePerl -M XML::SAX::Expat -M XML::Parser 
+pp_adds := -a "$(perl_vendor_lib)/Mojo/resources;lib/Mojo/resources" -a "$(perl_vendor_lib)/Mojo/IOLoop/resources;lib/Mojo/IOLoop/resources" -a "$(perl_vendor_lib)/Mojolicious/resources;lib/Mojolicious/resources"
 atomicparsley_zip := AtomicParsley-0.9.6-win32-bin.zip
 atomicparsley_zip_url := https://sourceforge.net/projects/get-iplayer/files/utils/$(atomicparsley_zip)
 build_atomicparsley := $(build)
 build_atomicparsley_zip := $(build_atomicparsley)/$(atomicparsley_zip)
 src_atomicparsley := $(src)/atomicparsley
-ffmpeg_zip := ffmpeg-4.1.3-win32-static.zip
+ffmpeg_zip := ffmpeg-4.2.1-win32-static.zip
 ffmpeg_zip_url := https://ffmpeg.zeranoe.com/builds/win32/static/$(ffmpeg_zip)
 build_ffmpeg := $(build)
 build_ffmpeg_zip := $(build_ffmpeg)/$(ffmpeg_zip)
 src_ffmpeg := $(src)/ffmpeg
 prog_files := $(shell echo $$PROGRAMFILES)
-iscc_inst := $(prog_files)/Inno Setup 6
+iscc_inst := $(prog_files)/Inno Setup 5
 iscc := $(iscc_inst)/ISCC.exe
 gip_inst := $(prog_files)/$(setup_name)
 curr_version := $(shell awk '/\#define GiPVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
@@ -95,13 +107,35 @@ endif
 
 gip: $(src_gip)
 
-$(build_perl_par):
+$(build_perl_zip):
 ifndef NOPERL
-	@mkdir -p "$(build_perl)";
-	@"$(perl)" "$(pp)" $(pp_mods) -B -p -o "$(build_perl_par)" "$(src_gip)"/{get_iplayer,get_iplayer.cgi}
+	@mkdir -p "$(build_perl)"
+	@if [ ! -f "$(build_perl_zip)" ]; then \
+		echo Downloading $(perl_zip); \
+		curl -\#fkL -o "$(build_perl_zip)" "$(perl_zip_url)" || exit 3; \
+	fi;
+	@echo created $(build_perl_zip)
+endif
+
+$(perl_inst): $(build_perl_zip)
+ifndef NOPERL
+	@mkdir -p "$(perl_inst)"
+	@unzip -o -q "$(build_perl_zip)" -d "$(perl_inst)"
+	@echo created $(perl_inst)
+endif
+
+$(pp): $(perl_inst)
+ifndef NOPERL
+	@"$(perl)" "$(cpanm)" $(cpanm_args) $(cpanm_mods)
+	@echo installed $(cpanm_mods)
+endif
+
+$(build_perl_par): $(pp)
+ifndef NOPERL
+	@"$(perl)" "$(pp)" $(pp_mods) $(pp_adds) -B -p -o "$(build_perl_par)" "$(src_gip)"/{get_iplayer,get_iplayer.cgi}
 	@echo created $(build_perl_par)
 endif
-	
+
 $(src_perl): $(src_gip) $(build_perl_par)
 ifndef NOPERL
 	@mkdir -p "$(src_perl)"
@@ -119,13 +153,20 @@ ifndef NOPERL
 	@cp -f "$(perl_inst)"/c/bin/liblzma*.dll "$(src_perl)"
 	@cp -f "$(perl_inst)"/c/bin/libcrypto*.dll "$(src_perl)"
 	@cp -f "$(perl_inst)"/c/bin/libssl*.dll "$(src_perl)"
-	@cp -f "$(perl_inst)"/perl/vendor/lib/Mozilla/CA.pm "$(src_perl)"/lib/Mozilla/CA.pm
-	@sed -b -E -i.bak -e 's/__FILE__/\$$INC\{"Mozilla\/CA.pm"\}/' "$(src_perl)"/lib/Mozilla/CA.pm
-	@rm -f "$(src_perl)"/lib/Mozilla/CA.pm.bak
 	@echo created $(src_perl)
 endif
 
-perl: $(src_perl)
+perl_edit: $(src_perl)
+ifndef NOPERL
+	@sed -b -E -e '/__FILE__/ s/__FILE__/\$$INC\{"Mozilla\/CA.pm"\}/' "$(perl_vendor_lib)"/Mozilla/CA.pm > "$(src_perl)"/lib/Mozilla/CA.pm 
+	@sed -b -E -e '/__FILE__/ s/__FILE__/\$$INC\{"Mojo\/Util.pm"\}/' "$(perl_vendor_lib)"/Mojo/Util.pm > "$(src_perl)"/lib/Mojo/Util.pm
+	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$(CERT|KEY)/ s/curfile->sibling\(([^)]+)\)->to_string/File::Spec->catfile(dirname($$INC{"Mojo\/IOLoop\/TLS.pm"}), \1)/' "$(perl_vendor_lib)"/Mojo/IOLoop/TLS.pm > "$(src_perl)"/lib/Mojo/IOLoop/TLS.pm
+	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$TEMPLATES/ s/curfile->sibling\(([^)]+)\)/File::Spec->catfile(dirname($$INC{"Mojolicious\/Renderer.pm"}), \1)/' "$(perl_vendor_lib)"/Mojolicious/Renderer.pm > "$(src_perl)"/lib/Mojolicious/Renderer.pm
+	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$PUBLIC/ s/curfile->sibling\(([^)]+)\)/File::Spec->catfile(dirname($$INC{"Mojolicious\/Static.pm"}), \1)/' "$(perl_vendor_lib)"/Mojolicious/Static.pm > "$(src_perl)"/lib/Mojolicious/Static.pm
+	@echo edited $(src_perl)
+endif
+
+perl: perl_edit
 
 $(build_atomicparsley_zip):
 ifndef NOUTILS
