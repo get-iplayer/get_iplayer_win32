@@ -60,6 +60,7 @@ perl_zip := $(perl_base).zip
 perl_zip_url := http://strawberryperl.com/download/$(perl_tag)/$(perl_zip)
 build_perl_zip := $(build_perl)/$(perl_zip)
 build_perl_par := $(build_perl)/perl-$(perl_tag).par
+build_perl_edit := $(build_perl)/perl_edit
 src_perl := $(src)/perl
 cpanm := $(perl_inst)/perl/bin/cpanm
 cpanm_args := -n
@@ -72,7 +73,8 @@ atomicparsley_zip_url := https://sourceforge.net/projects/get-iplayer/files/util
 build_atomicparsley := $(build)
 build_atomicparsley_zip := $(build_atomicparsley)/$(atomicparsley_zip)
 src_atomicparsley := $(src)/atomicparsley
-ffmpeg_zip := ffmpeg-4.2.1-win32-static.zip
+ffmpeg_ver := 4.2.1
+ffmpeg_zip := ffmpeg-$(ffmpeg_ver)-win32-static.zip
 ffmpeg_zip_url := https://ffmpeg.zeranoe.com/builds/win32/static/$(ffmpeg_zip)
 build_ffmpeg := $(build)
 build_ffmpeg_zip := $(build_ffmpeg)/$(ffmpeg_zip)
@@ -130,13 +132,13 @@ ifndef NOPERL
 	@echo installed $(cpanm_mods)
 endif
 
-$(build_perl_par): $(pp)
+$(build_perl_par): $(src_gip) $(pp)
 ifndef NOPERL
 	@"$(perl)" "$(pp)" $(pp_mods) $(pp_adds) -B -p -o "$(build_perl_par)" "$(src_gip)"/{get_iplayer,get_iplayer.cgi}
 	@echo created $(build_perl_par)
 endif
 
-$(src_perl): $(src_gip) $(build_perl_par)
+$(src_perl): $(build_perl_par)
 ifndef NOPERL
 	@mkdir -p "$(src_perl)"
 	@unzip -o -q "$(build_perl_par)" -d "$(src_perl)"
@@ -156,17 +158,18 @@ ifndef NOPERL
 	@echo created $(src_perl)
 endif
 
-perl_edit: $(src_perl)
+$(build_perl_edit): $(src_perl)
 ifndef NOPERL
 	@sed -b -E -e '/__FILE__/ s/__FILE__/\$$INC\{"Mozilla\/CA.pm"\}/' "$(perl_vendor_lib)"/Mozilla/CA.pm > "$(src_perl)"/lib/Mozilla/CA.pm 
 	@sed -b -E -e '/__FILE__/ s/__FILE__/\$$INC\{"Mojo\/Util.pm"\}/' "$(perl_vendor_lib)"/Mojo/Util.pm > "$(src_perl)"/lib/Mojo/Util.pm
 	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$(CERT|KEY)/ s/curfile->sibling\(([^)]+)\)->to_string/File::Spec->catfile(dirname($$INC{"Mojo\/IOLoop\/TLS.pm"}), \1)/' "$(perl_vendor_lib)"/Mojo/IOLoop/TLS.pm > "$(src_perl)"/lib/Mojo/IOLoop/TLS.pm
 	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$TEMPLATES/ s/curfile->sibling\(([^)]+)\)/File::Spec->catfile(dirname($$INC{"Mojolicious\/Renderer.pm"}), \1)/' "$(perl_vendor_lib)"/Mojolicious/Renderer.pm > "$(src_perl)"/lib/Mojolicious/Renderer.pm
 	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$PUBLIC/ s/curfile->sibling\(([^)]+)\)/File::Spec->catfile(dirname($$INC{"Mojolicious\/Static.pm"}), \1)/' "$(perl_vendor_lib)"/Mojolicious/Static.pm > "$(src_perl)"/lib/Mojolicious/Static.pm
+	@touch $(build_perl_edit)
 	@echo edited $(src_perl)
 endif
 
-perl: perl_edit
+perl: $(build_perl_edit)
 
 $(build_atomicparsley_zip):
 ifndef NOUTILS
@@ -255,6 +258,7 @@ clean:
 	@rm -f "$(build_setup)/$(setup_file)".{md5,sha1,sha256}
 	@echo removed $(build_setup)/$(setup_file)
 	@rm -fr "$(src)"
+	@rm -fr "$(build_perl_edit)"
 	@echo removed $(src)
 
 distclean: clean
