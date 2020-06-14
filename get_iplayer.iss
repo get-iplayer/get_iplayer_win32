@@ -2,35 +2,39 @@
 ; #define DUMPISPP
 ; #define NOPERL
 ; #define NOUTILS
+; #define WIN64
 #define AppName "get_iplayer"
-#ifndef GiPVersion
-  #define GiPVersion "0.00"
+#ifndef AppVersion
+  #define AppVersion "3.25.1"
 #endif
-#ifndef SetupPatch
-  #define SetupPatch "0"
+#ifdef WIN64
+	#define AppArch "x64"
+#else
+	#define AppArch "x86"
 #endif
-#define AppVersion GiPVersion + '.' + SetupPatch
-#define GiPSrc "build\\src\\get_iplayer"
-#define PerlSrc "build\\src\\perl"
-#define AtomicParsleySrc "build\\src\\atomicparsley"
-#define FFmpegSrc "build\\src\\ffmpeg"
-#define SetupDir "build\\setup"
-#define SetupSuffix '-setup'
+#define Build "build-" + AppArch
+#define Src Build + "\\src"
+#define PerlSrc Src + "\\perl"
+#define GiPSrc Src + "\\get_iplayer"
+#define AtomicParsleySrc Src + "\\atomicparsley"
+#define FFmpegSrc Src + "\\ffmpeg"
+#define SetupDir Build
+#define SetupSuffix "-windows-" + AppArch + "-setup"
 #ifdef NOPERL
-  #define SetupSuffix SetupSuffix + '-noperl'
+  #define SetupSuffix SetupSuffix + "-noperl"
 #endif
 #ifdef NOUTILS
-  #define SetupSuffix SetupSuffix + '-noutils'
+  #define SetupSuffix SetupSuffix + "-noutils"
 #endif
 #define PerlDir "{app}\\perl"
 #define UtilsDir "{app}\\utils"
-#define LicensesDir UtilsDir + "\\licenses"
+#define LicensesDir "{app}\\licenses"
 #define GiPIcon "{app}\\get_iplayer.ico"
 #define GiPPVRIcon "{app}\\get_iplayer_pvr.ico"
-#define HomeDir "%HOMEDRIVE%%HOMEPATH%"
 #define GiPRepo "https://github.com/get-iplayer/get_iplayer"
 #define GiPWiki GiPRepo + "/wiki"
 #define GiPWin32Repo "https://github.com/get-iplayer/get_iplayer_win32"
+#define HomeDir "%HOMEDRIVE%%HOMEPATH%"
 
 [Setup]
 AppCopyright=Copyright (C) 2008-2010 Phil Lewis
@@ -39,8 +43,12 @@ AppPublisher=The {#AppName} Contributors
 AppPublisherURL={#GiPRepo}
 AppSupportURL={#GiPWiki}
 AppUpdatesURL={#GiPWin32Repo}/releases
-AppVerName={#AppName} {#AppVersion}
+AppVerName={#AppName} {#AppVersion} ({#AppArch})
 AppVersion={#AppVersion}
+#ifdef WIN64
+ArchitecturesAllowed=x64
+ArchitecturesInstallIn64BitMode=x64
+#endif
 ChangesEnvironment=yes
 DefaultDirName={pf}\{#AppName}
 DefaultGroupName={#AppName}
@@ -53,18 +61,24 @@ DisableWelcomePage=no
 LicenseFile={#GiPSrc}\LICENSE.txt
 OutputBaseFilename={#AppName}-{#AppVersion}{#SetupSuffix}
 OutputDir={#SetupDir}
-SetupIconFile=get_iplayer.ico
-UninstallDisplayIcon={app}\get_iplayer_uninst.ico
+SetupIconFile={#AppName}.ico
+UninstallDisplayIcon={app}\{#AppName}_uninst.ico
 
 [Tasks]
 Name: desktopicons; Description: Create &desktop shortcuts (for all users); Flags: unchecked;
 
 [InstallDelete]
-; remove obsolete files
+; remove obsolete items
 Type: files; Name: {app}\get_iplayer.cgi.cmd;
 Type: filesandordirs; Name: {group}\Update;
 Type: files; Name: {group}\Uninstall.lnk;
-; ensure removal of obsolete uninstallers
+Type: files; Name: {#UtilsDir}\sources.txt;
+Type: files; Name: {#UtilsDir}\AtomicParsley.exe;
+Type: files; Name: {#UtilsDir}\ffmpeg.exe;
+Type: filesandordirs; Name: {#UtilsDir}\licenses;
+Type: filesandordirs; Name: {group}\Help;
+Type: files; Name: {group}\Uninstall {#AppName}
+; remove obsolete uninstallers
 Type: files; Name: {app}\Uninst.exe;
 Type: files; Name: {app}\uninstall.exe;
 #ifndef NOPERL
@@ -90,44 +104,45 @@ Source: get_iplayer.ico; DestDir: {app};
 Source: get_iplayer_pvr.ico; DestDir: {app};
 Source: get_iplayer_uninst.ico; DestDir: {app};
 Source: {#SetupSetting('LicenseFile')}; DestDir: {app};
+Source: sources.txt; DestDir: {app};
 #ifndef NOPERL
-Source: {#PerlSrc}\*; Excludes: "\MANIFEST,\META.yml,\script"; DestDir: {#PerlDir}; Flags: recursesubdirs createallsubdirs;
+Source: {#PerlSrc}\*; DestDir: {#PerlDir}; Excludes: \licenses; Flags: recursesubdirs createallsubdirs;
+Source: {#PerlSrc}\licenses\*; DestDir: {#LicensesDir}; Flags: recursesubdirs createallsubdirs;
 #endif
 #ifndef NOUTILS
-Source: sources.txt; DestDir: {#UtilsDir}
-Source: {#AtomicParsleySrc}\AtomicParsley.exe; DestDir: {#UtilsDir};
-Source: {#AtomicParsleySrc}\COPYING; DestDir: {#LicensesDir}\atomicparsley;
-Source: {#FFmpegSrc}\ffmpeg.exe; DestDir: {#UtilsDir}; MinVersion: 6.1;
+Source: {#AtomicParsleySrc}\AtomicParsley.exe; DestDir: {#UtilsDir}\bin; MinVersion: 6.1;
+Source: {#AtomicParsleySrc}\COPYING; DestDir: {#LicensesDir}\atomicparsley; MinVersion: 6.1;
+Source: {#FFmpegSrc}\ffmpeg.exe; DestDir: {#UtilsDir}\bin; MinVersion: 6.1;
 Source: {#FFmpegSrc}\LICENSE.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
 Source: {#FFmpegSrc}\README.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
 #endif
 
 [Icons]
 Name: {group}\{#AppName}; Filename: {cmd}; \
-  Parameters: /k get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help; \
+  Parameters: "/k """"{app}\get_iplayer.cmd"" --search dontshowanymatches && ""{app}\get_iplayer.cmd"" --help"""; \
   WorkingDir: {#HomeDir}; IconFilename: {#GiPIcon};
 Name: {group}\Web PVR Manager; Filename: {cmd}; \
-  Parameters: /c get_iplayer_web_pvr.cmd; WorkingDir: {#HomeDir}; IconFilename: {#GiPPVRIcon};
+  Parameters: "/c ""{app}\get_iplayer_web_pvr.cmd"""; WorkingDir: {#HomeDir}; IconFilename: {#GiPPVRIcon};
 Name: {group}\Run PVR Scheduler; Filename: {cmd}; \
-  Parameters: /k get_iplayer_pvr.cmd; WorkingDir: {#HomeDir}; IconFilename: {#GiPPVRIcon};
+  Parameters: "/k ""{app}\get_iplayer_pvr.cmd"""; WorkingDir: {#HomeDir}; IconFilename: {#GiPPVRIcon};
 Name: {group}\Uninstall {#AppName}; Filename: {uninstallexe}; IconFilename: {#SetupSetting('UninstallDisplayIcon')};
-Name: {group}\Help\{#AppName} Documentation; Filename: {#GiPWiki};
-Name: {group}\Help\AtomicParsley Documentation; Filename: http://atomicparsley.sourceforge.net;
-Name: {group}\Help\FFmpeg Documentation; Filename: http://ffmpeg.org/documentation.html;
-Name: {group}\Help\Perl Documentation; Filename: http://perldoc.perl.org;
-Name: {group}\Help\Strawberry Perl Home; Filename: http://strawberryperl.com;
 Name: {group}\Check for Update; Filename: {cmd}; \
-  Parameters: /k get_iplayer.cmd --release-check; \
+  Parameters: "/k ""{app}\get_iplayer.cmd"" --release-check"; \
   WorkingDir: {#HomeDir}; IconFilename: {#SetupSetting('UninstallDisplayIcon')};
 Name: {group}\Download {#AppName}; Filename: {#SetupSetting('AppUpdatesURL')};
+Name: {group}\{#AppName} Documentation; Filename: {#GiPWiki};
+Name: {group}\AtomicParsley Documentation; Filename: http://atomicparsley.sourceforge.net;
+Name: {group}\FFmpeg Documentation; Filename: http://ffmpeg.org/documentation.html;
+Name: {group}\Perl Documentation; Filename: http://perldoc.perl.org;
+Name: {group}\Strawberry Perl Home; Filename: http://strawberryperl.com;
 Name: {commondesktop}\{#AppName}; Filename: {cmd}; \
-  Parameters: /k get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help; \
+  Parameters: "/k """"{app}\get_iplayer.cmd"" --search dontshowanymatches && ""{app}\get_iplayer.cmd"" --help"""; \
   WorkingDir: {#HomeDir}; IconFilename: {#GiPIcon}; Tasks: desktopicons;
 Name: {commondesktop}\Web PVR Manager; Filename: {cmd}; \
-  Parameters: /c get_iplayer_web_pvr.cmd; WorkingDir: {#HomeDir}; \
+  Parameters: "/c ""{app}\get_iplayer_web_pvr.cmd"""; WorkingDir: {#HomeDir}; \
   IconFilename: {#GiPPVRIcon}; Tasks: desktopicons;
 Name: {commondesktop}\Run PVR Scheduler; Filename: {cmd}; \
-  Parameters: /k get_iplayer_pvr.cmd; WorkingDir: {#HomeDir}; \
+  Parameters: "/k ""{app}\get_iplayer_pvr.cmd"""; WorkingDir: {#HomeDir}; \
   IconFilename: {#GiPPVRIcon}; Tasks: desktopicons;
 Name: {commondesktop}\{#AppName} Documentation; Filename: {#GiPWiki}; Tasks: desktopicons;
 
@@ -140,10 +155,10 @@ Filename: {#GiPWiki}/releasenotes; Description: View {#AppName} release notes; \
   Flags: postinstall shellexec skipifsilent nowait;
 Filename: {group}\Help\{#AppName} Documentation.url; Description: View {#AppName} documentation; \
   Flags: postinstall shellexec skipifsilent nowait unchecked;
-Filename: {cmd}; Parameters: "/k ""set ""PATH=%PATH%;{app}"" && get_iplayer.cmd --search dontshowanymatches && get_iplayer.cmd --help"""; \
+Filename: {cmd}; Parameters: "/k ""set ""PATH=%PATH%;{app}"" && ""{app}\get_iplayer.cmd"" --search dontshowanymatches && ""{app}\get_iplayer.cmd"" --help"""; \
   WorkingDir: {%HOMEDRIVE}{%HOMEPATH}; Description: Launch {#AppName};  \
   Flags: postinstall skipifsilent nowait unchecked;
-Filename: {cmd}; Parameters: "/c ""set ""PATH=%PATH%;{app}"" && get_iplayer_web_pvr.cmd"""; \
+Filename: {cmd}; Parameters: "/c ""set ""PATH=%PATH%;{app}"" && ""{app}\get_iplayer_web_pvr.cmd"""; \
   WorkingDir: {%HOMEDRIVE}{%HOMEPATH}; Description: Launch Web PVR Manager; \
   Flags: postinstall skipifsilent nowait unchecked;
 
@@ -151,80 +166,153 @@ Filename: {cmd}; Parameters: "/c ""set ""PATH=%PATH%;{app}"" && get_iplayer_web_
 BeveledLabel={#SetupSetting('AppVerName')}
 
 [Code]
-function NSISUninstall(): Integer;
+function UninstallPrevious(UninstallString, UninstallParams, DisplayName: String): Integer;
 var
-  Uninstaller, Prompt: String;
+  Prompt: String;
   RC: Integer;
 begin
-  Log('NSISUninstall: enter');
+  Log('UninstallPrevious: Enter');
   Result := IDOK;
-  if not RegQueryStringValue(HKEY_LOCAL_MACHINE,
-    'Software\Microsoft\Windows\CurrentVersion\Uninstall\get_iplayer',
-    'UninstallString', Uninstaller) then
-  begin
-    Log('NSISUninstall: uninstaller not defined');
-    exit;
-  end;
-  Log('NSISUninstall: uninstaller=' + Uninstaller);
-  if not FileExists(Uninstaller) then
-  begin
-    Log('NSISUninstall: uninstaller not found');
-    exit;
-  end;
-  if Pos('Uninst.exe', Uninstaller) > 0 then
+  if Pos('Uninst.exe', UninstallString) > 0 then
   begin
     // get_iplayer 2.94.0/installer 4.9 or earlier
-    Prompt := 'Setup will now uninstall your previous version of {#AppName}. ';
-    Prompt := Prompt + 'Select "No" when prompted to "Remove User Preferences, ' +
-        'PVR Searches, Presets and Recording History". ';
-    Prompt := Prompt + 'If you configured a custom output directory with a previous ' +
-        'version of {#AppName} Setup, reconfigure it after installation with:' + #13#10#13#10 +
-        '{#AppName} --prefs-add --output="your_custom_output_directory_here"';
-    Prompt := Prompt + #13#10#13#10 + 'Click OK to continue or Cancel to exit setup';
+    Prompt := 'Setup must uninstall ' + DisplayName + ' before continuing. Your settings will be preserved. ' +
+      'Select "No" when prompted to "Remove User Preferences, PVR Searches, Presets and Recording History?". ' +
+      'If you configured a custom output directory with an obsolete version ' +
+      'of {#AppName} Setup, reconfigure it after installation with:' + #13#10#13#10 +
+      '{#AppName} --prefs-add --output="<output_directory>"' + #13#10#13#10 + 
+      'Click OK to continue or Cancel to exit {#AppName} Setup';
     Result := MsgBox(Prompt, mbConfirmation, MB_OKCANCEL or MB_DEFBUTTON2);
   end
   else
   begin
-    // get_iplayer 2.95.0 - 3.06.0
-    Prompt := 'Setup will now uninstall your previous version of {#AppName}. ';
-    Prompt := Prompt + #13#10#13#10 + 'Click OK to continue or Cancel to exit setup';
+    Prompt := 'Setup must uninstall ' + DisplayName + ' before continuing. ' +
+      'Your settings will be preserved.' + #13#10#13#10 +
+      'Click OK to continue or Cancel to exit {#AppName} Setup';
     Result := SuppressibleMsgBox(Prompt, mbConfirmation, MB_OKCANCEL or MB_DEFBUTTON2, IDOK);
   end;
   if Result = IDCANCEL then
   begin
-    Log('NSISUninstall: cancelled');
+    Log('UninstallPrevious: Cancelled');
     exit;
   end;
-  if not Exec(Uninstaller, '/S _?=' + ExtractFileDir(Uninstaller), '', SW_SHOW,
-      ewWaitUntilTerminated, RC) then
+  if not Exec(UninstallString, UninstallParams, '', SW_SHOW, ewWaitUntilTerminated, RC) then
   begin
-    Log(Format('NSISUninstall: uninstaller error: rc=%d msg=%s', [RC, SysErrorMessage(RC)]));
-    Prompt := 'Uninstall of your previous version of {#AppName} generated an error.';
-    Prompt := Prompt + #13#10#13#10 + Format('ERROR: Code=%d Message=%s', [RC, SysErrorMessage(RC)]);
+    Log(Format('UninstallPrevious: Error: rc=%d msg=%s', [RC, SysErrorMessage(RC)]));
+    Prompt := 'Uninstall of ' + DisplayName + ' generated an error.' + #13#10#13#10 + 
+      Format('ERROR: Code=%d Message=%s', [RC, SysErrorMessage(RC)]);
   end
   else
   begin
     if RC <> 0 then
     begin
-      Log(Format('NSISUninstall: uninstaller aborted: rc=%d', [RC]));
-      Prompt := 'Uninstall of your previous version of {#AppName} was aborted.';
+      Log(Format('UninstallPrevious: Aborted: rc=%d', [RC]));
+      Prompt := 'Uninstall of ' + DisplayName + ' was aborted.';
     end;
   end;
   if RC <> 0 then
   begin
-    Log('NSISUninstall: failed');
-    Prompt := Prompt + #13#10#13#10 + 'Uninstall your previous version of {#AppName} ' +
-        'in Windows Control Panel and then re-run {#AppName} Setup.';
+    Log('UninstallPrevious: Failed');
+    Prompt := Prompt + #13#10#13#10 + 
+      'Uninstall ' + DisplayName + ' in Settings->Apps->Apps & features ' +
+      'or Control Panel->Programs and Features and then run {#AppName} Setup again.';
     SuppressibleMsgBox(Prompt, mbError, MB_OK, IDOK);
     Result := IDCANCEL;
+  end;
+  Log(Format('UninstallPrevious: Exit=%d', [Result]));
+end;
+
+function NSISUninstallPrevious(): Integer;
+var
+  RegKey, UninstallString, UninstallParams, DisplayName: String;
+begin
+  Log('NSISUninstallPrevious: Enter');
+  Result := IDOK;
+  RegKey := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#AppName}';
+  Log('NSISUninstallPrevious: RegKey=' + RegKey);
+  if not RegQueryStringValue(HKLM32, RegKey, 'UninstallString', UninstallString) then
+  begin
+    Log('NSISUninstallPrevious: UninstallString not defined');
+    exit;
+  end;
+  UninstallString := RemoveQuotes(UninstallString);
+  Log('NSISUninstallPrevious: UninstallString=' + UninstallString);
+  if not FileExists(UninstallString) then
+  begin
+    Log('NSISUninstallPrevious: UninstallString not found');
+    exit;
+  end;
+  UninstallParams := '/S _?=' + ExtractFileDir(UninstallString);
+  Log('NSISUninstallPrevious: UninstallParams=' + UninstallParams);
+  if not RegQueryStringValue(HKLM32, RegKey, 'DisplayName', DisplayName) then
+  begin
+    Log('NSISUninstallPrevious: DisplayName not defined');
+    DisplayName := 'an obsolete version';
+  end;
+  Log('NSISUninstallPrevious: DisplayName=' + DisplayName);
+  Result := UninstallPrevious(UninstallString, UninstallParams, DisplayName);
+  if Result = IDOK then
+  begin
+    // ensure removal of obsolete system options
+    DeleteFile(ExpandConstant('{commonappdata}\{#AppName}\options'));
+    RemoveDir(ExpandConstant('{commonappdata}\{#AppName}'));
+  end;
+  Log(Format('NSISUninstallPrevious: Exit=%d', [Result]));
+end;
+
+function InnoUninstallPrevious(): Integer;
+var
+  RegKey, UninstallString, UninstallParams, DisplayName: String;
+  US, DN: Boolean;
+begin
+  Log('InnoUninstallPrevious: Enter');
+  Result := IDOK;
+  RegKey := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{#AppName}_is1';
+  Log('InnoUninstallPrevious: RegKey=' + RegKey);
+  if Is64BitInstallMode() then
+  begin
+    Log('InnoUninstallPrevious: Is64BitInstallMode=True');
+    US := RegQueryStringValue(HKLM32, RegKey, 'UninstallString', UninstallString);
+    DN := RegQueryStringValue(HKLM32, RegKey, 'DisplayName', DisplayName);
   end
   else
   begin
-    // ensure removal of obsolete system options
-    DeleteFile(ExpandConstant('{commonappdata}\get_iplayer\options'));
-    RemoveDir(ExpandConstant('{commonappdata}\get_iplayer'));
+    Log('InnoUninstallPrevious: Is64BitInstallMode=False');
+    if IsWin64() then
+    begin
+      Log('InnoUninstallPrevious: IsWin64=True');
+      US := RegQueryStringValue(HKLM64, RegKey, 'UninstallString', UninstallString);
+      DN := RegQueryStringValue(HKLM64, RegKey, 'DisplayName', DisplayName);
+    end
+    else
+    begin
+      Log('InnoUninstallPrevious: IsWin64=False');
+      Log('InnoUninstallPrevious: No need to remove previous version');
+      exit;
+    end;
   end;
-  Log(Format('NSISUninstall: exit=%d', [Result]));
+  if not US then
+  begin
+    Log('InnoUninstallPrevious: UninstallString not defined');
+    exit;
+  end;
+  UninstallString := RemoveQuotes(UninstallString);
+  Log('InnoUninstallPrevious: UninstallString=' + UninstallString);
+  if not FileExists(UninstallString) then
+  begin
+    Log('InnoUninstallPrevious: UninstallString not found');
+    exit;
+  end;
+  UninstallParams := '/VERYSILENT /SUPPRESSMSGBOXES';
+  Log('InnoUninstallPrevious: UninstallParams=' + UninstallParams);
+  if not DN then
+  begin
+    Log('InnoUninstallPrevious: DisplayName not defined');
+    DisplayName := 'your previous version';
+  end;
+  Log('InnoUninstallPrevious: DisplayName=' + DisplayName);
+  Result := UninstallPrevious(UninstallString, UninstallParams, DisplayName);
+  Log(Format('InnoUninstallPrevious: Exit=%d', [Result]));
 end;
 
 function IsWindows7OrLater(): Boolean;
@@ -237,14 +325,13 @@ var
   Prompt: String;
 begin
   Result := IDOK;
-  Prompt := 'NOTE: {#AppName} is not supported by the developers for use on Windows XP or Vista. ' +
-      'Windows 7 is the minimum version required by the bundled version of ffmpeg. ' +
-      'ffmpeg is not required to download programmes, but it is required to convert ' +
-      'output files to MP4 and to add metadata tags. If you wish to use get_iplayer ' +
-      'on Windows XP or Vista, you must install a compatible version of ffmpeg in ' +
-      'the following directory:' + #13#10#13#10 +
-      ExpandConstant('{#UtilsDir}') + #13#10#13#10 +
-      'Click OK to continue or Cancel to exit setup';
+  Prompt := 'NOTE: Windows 7 is the minimum version required for the bundled versions ' +
+    'of ffmpeg and AtomicParsley. ffmpeg and AtomicParsley are not required to download ' +
+    'programmes, but they are required to convert output files to MP4 and to add metadata tags. ' +
+    'If you wish to use {#AppName} on Windows XP/Vista, you must install compatible versions ' +
+    'of ffmpeg and AtomicParsley in the following directory:' + #13#10#13#10 + 
+    ExpandConstant('{#UtilsDir}\bin') + #13#10#13#10 +
+    'Click OK to continue or Cancel to exit setup';
   Result := MsgBox(Prompt, mbConfirmation, MB_OKCANCEL or MB_DEFBUTTON2);
 end;
 
@@ -261,13 +348,50 @@ begin
       exit;
     end;
   end;
-  RC := NSISUninstall();
+  RC := NSISUninstallPrevious();
+  if RC = IDCANCEL then
+  begin
+    Result := 'Setup cancelled';
+    exit;
+  end;
+  RC := InnoUninstallPrevious();
   if RC = IDCANCEL then
   begin
     Result := 'Setup cancelled';
     exit;
   end;
 end;
+
+function PathCheck(Param: String): Boolean;
+var
+    OrigPath: String;
+    Index: Integer;
+begin
+  Log('PathCheck: Enter');
+  if not RegQueryStringValue(HKEY_LOCAL_MACHINE,
+    'SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
+    'Path', OrigPath) then
+  begin
+    Log('PathCheck: Empty path');
+    Result := True;
+    exit;
+  end;
+  Index := Pos(';' + Param + ';', OrigPath + ';');
+  Log(Format('PathCheck: Index=%d OrigPath=%s', [Index, OrigPath]));
+  if IsUninstaller() and (Index > 0) then
+  begin
+    Log('PathCheck: Uninstall');
+    Delete(OrigPath, Index, Length(Param) + 1);
+    if not RegWriteStringValue(HKEY_LOCAL_MACHINE,
+      'SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
+      'Path', OrigPath) then
+    begin
+      Log('PathCheck: Write failed');
+    end;
+  end;
+  Result := (Index = 0);
+  Log(Format('PathCheck: Exit=%d', [Result]));
+ end;
 
 function CopyLog(): Boolean;
 var
@@ -282,44 +406,6 @@ begin
     Result := FileCopy(LogFile, LogFileCopy, False);
   end;
 end;
-
-// function ShouldSkipPage(PageID: Integer): Boolean;
-// begin
-//   Result := False;
-//   if (PageID = wpReady) and (not IsTaskSelected('desktopicons')) then
-//     Result := True;
-// end;
-
-function PathCheck(Param: string): Boolean;
-var
-    OrigPath: String;
-    Index: Integer;
-begin
-  Log('PathCheck: enter');
-  if not RegQueryStringValue(HKEY_LOCAL_MACHINE,
-    'SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
-    'Path', OrigPath) then
-  begin
-    Log('PathCheck: empty path');
-    Result := True;
-    exit;
-  end;
-  Index := Pos(';' + Param + ';', OrigPath + ';');
-  Log(Format('PathCheck: index=%d path=%s', [Index, OrigPath]));
-  if IsUninstaller() and (Index > 0) then
-  begin
-    Log('PathCheck: uninstall');
-    Delete(OrigPath, Index, Length(Param) + 1);
-    if not RegWriteStringValue(HKEY_LOCAL_MACHINE,
-      'SYSTEM\CurrentControlSet\Control\Session Manager\Environment',
-      'Path', OrigPath) then
-    begin
-      Log('PathCheck: write failed');
-    end;
-  end;
-  Result := (Index = 0);
-  Log(Format('PathCheck: exit=%d', [Result]));
- end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin

@@ -1,4 +1,6 @@
 build
+build-x64
+build-x86
 perl
 test
 utils

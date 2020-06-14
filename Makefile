@@ -1,9 +1,10 @@
 # Build win32 installer for get_iplayer
-# Requires: Git for Windows 32-bit w/Git Bash, MSYS make 32-bit, Strawberry Perl 32-bit w/64-bit int, PAR::Packer, Inno Setup
-# Requires: Download http://repo.msys2.org/msys/i686/make-4.2.1-1-i686.pkg.tar.xz
-# Requires: Extract make.exe and place in $PROGRAMFILES\Git\usr\bin
+# Prereqs: MSYS2 (64-bit), INNO Setup 5
+# Prereqs: pacman -S git make p7zip winpty
 # Build release (VERSION = tag in get_iplayer repo w/o "v" prefix"):
 # VERSION=3.14 make release
+# Build 64-bit release
+# VERSION=3.14 WIN64=1 make release
 # Rebuild all dependencies and build release:
 # VERSION=3.14 make distclean release
 # Specify installer patch number for release (default = 0):
@@ -15,23 +16,42 @@
 
 ifndef VERSION
 	gip_tag := master
-	VERSION := 0.00
+	VERSION := 0.0
+	PATCH := 0
 	WIP := 1
 else
 	gip_tag := v$(VERSION)
-endif
 ifndef PATCH
 	PATCH := 0
+endif
 endif
 ifdef TAG
 	gip_tag := $(TAG)
 endif
-
-build := build
-src := $(build)/src
-build_setup := $(build)
-setup_name := get_iplayer
+ifdef WIN64
+	bits := 64
+    arch := x64
+	DWIN64 := -DWIN64
+else
+	bits := 32
+    arch := x86
+endif
 setup_ver := $(VERSION).$(PATCH)
+ifndef WIP
+setup_tag := $(shell git tag -l $(setup_ver))
+ifeq ($(setup_tag), $(setup_ver))
+    WIP := 1
+endif
+endif
+build := build-$(arch)
+src := $(build)/src
+setup_name := get_iplayer
+setup_iss := $(setup_name).iss
+curr_version := $(shell awk '/#define AppVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_iss)")
+ifeq ($(setup_ver), 0.0.0)
+setup_ver := $(curr_version)
+endif
+next_version := $(shell echo $(setup_ver) | awk -F. '{print $$1"."$$2"."$$3+1}')
 setup_suffix := -setup
 ifdef NOPERL
 	DNOPERL := -DNOPERL
@@ -41,193 +61,203 @@ ifdef NOUTILS
 	DNOUTILS := -DNOUTILS
 	setup_suffix := $(setup_suffix)-noutils
 endif
-setup_base := $(setup_name)-$(setup_ver)$(setup_suffix)
-setup_file := $(setup_base).exe
-setup_src := $(setup_name).iss
-gip_zip := get_iplayer-$(gip_tag).zip
-build_gip := $(build)
-build_gip_zip := $(build_gip)/$(gip_zip)
-src_gip := $(src)/get_iplayer
-gip_repo := ../get_iplayer
-perl_ver := 5.30.1
-perl_tag := $(perl_ver).1
-build_perl := $(build)
-perl_base := strawberry-perl-$(perl_tag)-32bit-portable
-perl_inst := $(build_perl)/$(perl_base)
-perl := $(perl_inst)/portableshell.bat
-perl_vendor_lib = $(perl_inst)/perl/vendor/lib
-perl_zip := $(perl_base).zip
-perl_zip_url := http://strawberryperl.com/download/$(perl_tag)/$(perl_zip)
-build_perl_zip := $(build_perl)/$(perl_zip)
-build_perl_par := $(build_perl)/perl-$(perl_tag).par
-build_perl_edit := $(build_perl)/perl_edit
-src_perl := $(src)/perl
-cpanm := $(perl_inst)/perl/bin/cpanm
-cpanm_args := -n
-cpanm_mods := PAR::Packer
-pp := $(perl_inst)/perl/site/bin/pp
-pp_mods := -M Encode::Byte -M JSON -M JSON::XS -M JSON::PP -M Mojolicious -M XML::LibXML -M XML::LibXML::SAX -M XML::LibXML::SAX::Parser -M XML::SAX::PurePerl -M XML::SAX::Expat -M XML::Parser 
-pp_adds := -a "$(perl_vendor_lib)/Mojo/resources;lib/Mojo/resources" -a "$(perl_vendor_lib)/Mojo/IOLoop/resources;lib/Mojo/IOLoop/resources" -a "$(perl_vendor_lib)/Mojolicious/resources;lib/Mojolicious/resources"
-atomicparsley_zip := AtomicParsley-0.9.6-win32-bin.zip
-atomicparsley_zip_url := https://sourceforge.net/projects/get-iplayer/files/utils/$(atomicparsley_zip)
-build_atomicparsley := $(build)
-build_atomicparsley_zip := $(build_atomicparsley)/$(atomicparsley_zip)
-src_atomicparsley := $(src)/atomicparsley
-ffmpeg_ver := 4.2.1
-ffmpeg_zip := ffmpeg-$(ffmpeg_ver)-win32-static.zip
-ffmpeg_zip_url := https://ffmpeg.zeranoe.com/builds/win32/static/$(ffmpeg_zip)
-build_ffmpeg := $(build)
-build_ffmpeg_zip := $(build_ffmpeg)/$(ffmpeg_zip)
-src_ffmpeg := $(src)/ffmpeg
-prog_files := $(shell echo $$PROGRAMFILES)
-iscc_inst := $(prog_files)/Inno Setup 5
-iscc := $(iscc_inst)/ISCC.exe
+setup_base := $(setup_name)-$(setup_ver)-windows-$(arch)$(setup_suffix)
+setup_exe := $(setup_base).exe
+build_setup_exe := $(build)/$(setup_exe)
+prog_files := $(PROGRAMFILES)
+prog_files_32 := $(PROGRAMFILES) (x86)
+ifdef WIN64
 gip_inst := $(prog_files)/$(setup_name)
-curr_version := $(shell awk '/\#define GiPVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
-curr_patch := $(shell awk '/\#define SetupPatch/ {gsub("\"", "", $$3); print $$3;}' "$(setup_src)")
+else
+gip_inst := $(prog_files_32)/$(setup_name)
+endif
+sbpl_ver := 5.30.2.1
+sbpl_base := strawberry-perl-$(sbpl_ver)-$(bits)bit-portable
+sbpl_zip := $(sbpl_base).zip
+build_sbpl := $(build)/$(sbpl_base)
+sbpl_zip_url := http://strawberryperl.com/download/$(sbpl_ver)/$(sbpl_zip)
+build_sbpl_zip := $(build)/$(sbpl_zip)
+sbpl_exe := $(build_sbpl)/portableshell.bat
+sbpl_cpanm := $(build_sbpl)/perl/bin/cpanm.bat
+perldist_strawberry := $(build_sbpl)/perl/site/bin/perldist_strawberry.bat
+perl_ver := 5.32.0.1
+perl_base := perl
+build_perl := $(build)/$(perl_base)
+build_work := $(build)/work
+perl_pp := $(perl_base)-$(bits)bit.pp
+perldist_strawberry_ver :=$(perl_ver)
+perldist_strawberry_zip := $(build_work)/output/$(perl_base)-$(perldist_strawberry_ver)-$(bits)bit-portable.zip
+perl_exe := $(build_perl)/portableshell.bat
+perl_cpanm := $(build_perl)/perl/bin/cpanm.bat
+perl_zip := $(perl_base)-$(perl_ver)-$(bits)bit.zip
+build_perl_zip := $(build)/$(perl_zip)
+src_perl := $(src)/perl
+src_perl_exe := $(src_perl)/bin/perl.exe
+gip_repo := ../get_iplayer
+gip_zip := get_iplayer-$(gip_tag).zip
+build_gip_zip := $(build)/$(gip_zip)
+src_gip := $(src)/get_iplayer
+atomicparsley_ver := 0.9.7-get_iplayer.1
+atomicparsley_zip := AtomicParsley-$(atomicparsley_ver)-windows-$(arch).zip
+atomicparsley_zip_url := https://github.com/get-iplayer/atomicparsley/releases/download/$(atomicparsley_ver)/$(atomicparsley_zip)
+build_atomicparsley_zip := $(build)/$(atomicparsley_zip)
+src_atomicparsley := $(src)/atomicparsley
+ffmpeg_ver := 4.3
+ffmpeg_zip := ffmpeg-$(ffmpeg_ver)-win$(bits)-static.zip
+ffmpeg_zip_url := https://ffmpeg.zeranoe.com/builds/win$(bits)/static/$(ffmpeg_zip)
+build_ffmpeg_zip := $(build)/$(ffmpeg_zip)
+src_ffmpeg := $(src)/ffmpeg
+iscc_inst := $(prog_files_32)/Inno Setup 5
+iscc := $(iscc_inst)/ISCC.exe
 
 dummy:
 	@echo Nothing to make
 
+$(build_sbpl_zip):
+ifndef NOPERL
+	@mkdir -p $(build)
+	@echo downloading $(sbpl_zip_url)
+	@curl -\#fkL -o $(build_sbpl_zip) $(sbpl_zip_url)
+	@echo downloaded $(build_sbpl_zip)
+	@touch $(build_sbpl_zip)
+endif
+
+$(build_sbpl): $(build_sbpl_zip)
+ifndef NOPERL
+	@mkdir -p $(build_sbpl)
+	@7za x -aoa -o$(build_sbpl) $(build_sbpl_zip)
+	@winpty $(sbpl_exe) $(sbpl_cpanm) -n Perl::Dist::Strawberry
+	@echo created $(build_sbpl)
+	@touch $(build_sbpl)
+endif
+
+sbpl: $(build_sbpl)
+
+$(build_perl_zip): $(build_sbpl)
+ifndef NOPERL
+	@mkdir -p $(build_perl)
+	@mkdir -p $(build_work)
+	@winpty $(sbpl_exe) $(perldist_strawberry) -job "$$(echo $$PWD)/$(perl_pp)" \
+		-image_dir "$$(echo $$PWD)/$(build_perl)" -working_dir "$$(echo $$PWD)/$(build_work)" \
+		-perl_64bitint -notest_core -notest_modules -nointeractive -norestorepoints
+	@cp -f $(perldist_strawberry_zip) $(build_perl_zip)
+	@echo created $(build_perl_zip)
+	@touch $(build_perl_zip)
+endif
+
+$(src_perl): $(build_perl_zip)
+ifndef NOPERL
+	@mkdir -p $(src_perl)
+	@7za x -aoa -o$(src) $(build_perl_zip) perl/bin/perl.exe perl/bin/*.dll perl/{lib,vendor}
+	@7za x -aoa -o$(src_perl) $(build_perl_zip) licenses
+	@7za e -aoa -o$(src_perl)/bin $(build_perl_zip) c/bin/{libcrypto,libgdbm,libiconv,liblzma,libssl,libxml2,zlib}*.dll
+	@echo created $(src_perl)
+	@touch $(src_perl)
+endif
+
+perl: $(src_perl)
+
+perlclean:
+	@rm -fr $(src_perl)
+	@echo removed $(src_perl)
+
 $(build_gip_zip):
 ifndef NOGIP
-	@mkdir -p "$(build_gip)"
-	@git --git-dir="$(gip_repo)"/.git --work-tree="$(gip_repo)" update-index --refresh --unmerged
-	@git --git-dir="$(gip_repo)"/.git archive --format=zip $(gip_tag) > "$(build_gip_zip)"
+	@mkdir -p $(build)
+	@git --git-dir=$(gip_repo)/.git --work-tree=$(gip_repo) update-index --refresh --unmerged
+	@git --git-dir=$(gip_repo)/.git archive --format=zip $(gip_tag) > $(build_gip_zip)
 	@echo created $(build_gip_zip)
+	@touch $(build_gip_zip)
 endif
 
 $(src_gip): $(build_gip_zip)
 ifndef NOGIP
-	@mkdir -p "$(src_gip)"
-	@unzip -j -o -q "$(build_gip_zip)" get_iplayer get_iplayer.cgi LICENSE.txt -d "$(src_gip)"
-	@sed -b -E -i.bak -e 's/^(my (\$$version_text|\$$VERSION_TEXT)).*/\1 = "$(setup_ver)-\$$^O";/' \
-		"$(src_gip)"/{get_iplayer,get_iplayer.cgi}
-	@rm -f "$(src_gip)"/{get_iplayer,get_iplayer.cgi}.bak
+	@mkdir -p $(src_gip)
+	@7za e -aoa -o$(src_gip) $(build_gip_zip) get_iplayer get_iplayer.cgi LICENSE.txt
+	@sed -b -E -i.bak -e 's/^(my (\$$version_text|\$$VERSION_TEXT)).*/\1 = "$(setup_ver)-\$$^O-$(arch)";/' \
+		$(src_gip)/{get_iplayer,get_iplayer.cgi}
+	@rm -f $(src_gip)/{get_iplayer,get_iplayer.cgi}.bak
 	@echo created $(src_gip)
+	@touch $(src_gip)
 endif
 
 gip: $(src_gip)
 
-$(build_perl_zip):
-ifndef NOPERL
-	@mkdir -p "$(build_perl)"
-	@if [ ! -f "$(build_perl_zip)" ]; then \
-		echo Downloading $(perl_zip); \
-		curl -\#fkL -o "$(build_perl_zip)" "$(perl_zip_url)" || exit 3; \
-	fi;
-	@echo created $(build_perl_zip)
-endif
-
-$(perl_inst): $(build_perl_zip)
-ifndef NOPERL
-	@mkdir -p "$(perl_inst)"
-	@unzip -o -q "$(build_perl_zip)" -d "$(perl_inst)"
-	@echo created $(perl_inst)
-endif
-
-$(pp): $(perl_inst)
-ifndef NOPERL
-	@"$(perl)" "$(cpanm)" $(cpanm_args) $(cpanm_mods)
-	@echo installed $(cpanm_mods)
-endif
-
-$(build_perl_par): $(src_gip) $(pp)
-ifndef NOPERL
-	@"$(perl)" "$(pp)" $(pp_mods) $(pp_adds) -B -p -o "$(build_perl_par)" "$(src_gip)"/{get_iplayer,get_iplayer.cgi}
-	@echo created $(build_perl_par)
-endif
-
-$(src_perl): $(build_perl_par)
-ifndef NOPERL
-	@mkdir -p "$(src_perl)"
-	@unzip -o -q "$(build_perl_par)" -d "$(src_perl)"
-	@mkdir -p "$(src_perl)"/licenses
-	@cp -f "$(perl_inst)"/licenses/perl/* "$(src_perl)"/licenses
-	@cp -fR "$(perl_inst)"/perl/lib/unicore/* "$(src_perl)"/lib/unicore
-	@cp -f "$(perl_inst)"/perl/lib/utf8_heavy.pl "$(src_perl)"/lib
-	@cp -f "$(perl_inst)"/perl/bin/*.dll "$(src_perl)"
-	@cp -f "$(perl_inst)"/perl/bin/perl.exe "$(src_perl)"
-	@cp -f "$(perl_inst)"/c/bin/libexpat*.dll "$(src_perl)"
-	@cp -f "$(perl_inst)"/c/bin/libiconv*.dll "$(src_perl)"
-	@cp -f "$(perl_inst)"/c/bin/libxml2*.dll "$(src_perl)"
-	@cp -f "$(perl_inst)"/c/bin/zlib*.dll "$(src_perl)"
-	@cp -f "$(perl_inst)"/c/bin/liblzma*.dll "$(src_perl)"
-	@cp -f "$(perl_inst)"/c/bin/libcrypto*.dll "$(src_perl)"
-	@cp -f "$(perl_inst)"/c/bin/libssl*.dll "$(src_perl)"
-	@echo created $(src_perl)
-endif
-
-$(build_perl_edit): $(src_perl)
-ifndef NOPERL
-	@sed -b -E -e '/__FILE__/ s/__FILE__/\$$INC\{"Mozilla\/CA.pm"\}/' "$(perl_vendor_lib)"/Mozilla/CA.pm > "$(src_perl)"/lib/Mozilla/CA.pm 
-	@sed -b -E -e '/__FILE__/ s/__FILE__/\$$INC\{"Mojo\/Util.pm"\}/' "$(perl_vendor_lib)"/Mojo/Util.pm > "$(src_perl)"/lib/Mojo/Util.pm
-	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$(CERT|KEY)/ s/curfile->sibling\(([^)]+)\)->to_string/File::Spec->catfile(dirname($$INC{"Mojo\/IOLoop\/TLS.pm"}), \1)/' "$(perl_vendor_lib)"/Mojo/IOLoop/TLS.pm > "$(src_perl)"/lib/Mojo/IOLoop/TLS.pm
-	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$TEMPLATES/ s/curfile->sibling\(([^)]+)\)/File::Spec->catfile(dirname($$INC{"Mojolicious\/Renderer.pm"}), \1)/' "$(perl_vendor_lib)"/Mojolicious/Renderer.pm > "$(src_perl)"/lib/Mojolicious/Renderer.pm
-	@sed -b -E -e '/use Mojo::File/ s/^.*$$/use File::Basename qw(dirname);\n\0/' -e '/my \$$PUBLIC/ s/curfile->sibling\(([^)]+)\)/File::Spec->catfile(dirname($$INC{"Mojolicious\/Static.pm"}), \1)/' "$(perl_vendor_lib)"/Mojolicious/Static.pm > "$(src_perl)"/lib/Mojolicious/Static.pm
-	@touch $(build_perl_edit)
-	@echo edited $(src_perl)
-endif
-
-perl: $(build_perl_edit)
+gipclean:
+	@rm -fr $(src_gip)
+	@echo removed $(src_gip)
 
 $(build_atomicparsley_zip):
 ifndef NOUTILS
-	@mkdir -p "$(build_atomicparsley)"
-	@if [ ! -f "$(build_atomicparsley_zip)" ]; then \
-		echo Downloading $(atomicparsley_zip); \
-		curl -\#fkL -o "$(build_atomicparsley_zip)" "$(atomicparsley_zip_url)" || exit 3; \
-	fi;
-	@echo created $(build_atomicparsley_zip)
+	@mkdir -p $(build)
+	@echo downloading $(atomicparsley_zip_url)
+	@curl -\#fkL -o $(build_atomicparsley_zip) $(atomicparsley_zip_url)
+	@echo downloaded $(build_atomicparsley_zip)
+	@touch $(build_atomicparsley_zip)
 endif
 
 $(src_atomicparsley): $(build_atomicparsley_zip)
 ifndef NOUTILS
-	@mkdir -p "$(src_atomicparsley)"
-	@unzip -j -o -q "$(build_atomicparsley_zip)" AtomicParsley.exe COPYING -d "$(src_atomicparsley)"
+	@mkdir -p $(src_atomicparsley)
+	@7za e -aoa -o$(src_atomicparsley) $(build_atomicparsley_zip) AtomicParsley.exe COPYING
 	@echo created $(src_atomicparsley)
+	@touch $(src_atomicparsley)
 endif
 
 atomicparsley: $(src_atomicparsley)
 
+atomicparsleyclean:
+	@rm -fr $(src_atomicparsley)
+	@echo removed $(src_atomicparsley)
+
 $(build_ffmpeg_zip):
 ifndef NOUTILS
-	@mkdir -p "$(build_ffmpeg)"
-	@if [ ! -f "$(build_ffmpeg_zip)" ]; then \
-		echo Downloading $(ffmpeg_zip); \
-		curl -\#fkL -o "$(build_ffmpeg_zip)" "$(ffmpeg_zip_url)" || exit 3; \
-	fi;
-	@echo created $(build_ffmpeg_zip)
+	@mkdir -p $(build)
+	@echo downloading $(ffmpeg_zip_url)
+	@curl -\#fkL -o $(build_ffmpeg_zip) $(ffmpeg_zip_url)
+	@echo downloaded $(build_ffmpeg_zip)
+	@touch $(build_ffmpeg_zip)
 endif
 
 $(src_ffmpeg): $(build_ffmpeg_zip)
 ifndef NOUTILS
-	@mkdir -p "$(src_ffmpeg)"
-	@unzip -j -o -q "$(build_ffmpeg_zip)" */bin/ffmpeg.exe */LICENSE.txt */README.txt -d "$(src_ffmpeg)"
+	@mkdir -p $(src_ffmpeg)
+	@7za e -aoa -o$(src_ffmpeg) $(build_ffmpeg_zip) */bin/ffmpeg.exe */LICENSE.txt */README.txt
 	@echo created $(src_ffmpeg)
+	@touch $(src_ffmpeg)
 endif
 
 ffmpeg: $(src_ffmpeg)
 
-deps: gip perl atomicparsley ffmpeg
+ffmpegclean:
+	@rm -fr $(src_ffmpeg)
+	@echo removed $(src_ffmpeg)
 
-$(build_setup)/$(setup_file): $(setup_src)
+utils: atomicparsley ffmpeg
+
+utilsclean: atomicparsleyclean ffmpegclean
+
+deps: perl gip atomicparsley ffmpeg
+
+depsclean: perlclean gipclean atomicparsleyclean ffmpegclean
+
+$(build_setup_exe): $(setup_iss)
 ifndef NOSETUP
-	@mkdir -p $(build_setup)
-	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(VERSION)"/' \
-		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(PATCH)"/' $(setup_src)
-	@rm -f $(setup_src).bak
-	@"$(iscc)" -DGiPVersion="$(VERSION)" -DSetupPatch="$(PATCH)" \
-		$(DNOPERL) $(DNOUTILS) -O"$(build_setup)" -F"$(setup_base)" -Q "$(setup_src)"
-	@pushd $(build_setup); \
-		md5sum $(setup_file) > $(setup_file).md5 || exit 6; \
-		sha1sum $(setup_file) > $(setup_file).sha1 || exit 6; \
-		sha256sum $(setup_file) > $(setup_file).sha256 || exit 6; \
-	popd
-	@echo built $(build_setup)/$(setup_file)
+	@mkdir -p $(build)
+	@echo building $(build_setup_exe)
+	@"$(iscc)" $(DWIN64) $(DNOPERL) $(DNOUTILS) -DAppVersion=$(setup_ver) -O$(build) -F$(setup_base) -Q $(setup_iss)
+	@pushd $(build) > /dev/null; \
+		sha256sum $(setup_exe) > $(setup_exe).sha256 || exit 2; \
+	popd > /dev/null;
+	@echo built $(build_setup_exe)
+	@touch $(build_setup_exe)
 endif
 
-setup: $(build_setup)/$(setup_file)
+setup: $(build_setup_exe)
+
+setupclean:
+	@rm -fr $(build_setup_exe)
+	@echo removed $(build_setup_exe)
 
 checkout:
 ifndef WIP
@@ -237,41 +267,44 @@ endif
 
 commit:
 ifndef WIP
-	@git commit -m "$(setup_ver)" "$(setup_src)"
+	@sed -b -E -i.bak -e 's/(#define AppVersion) "[0-9]+\.[0-9]+\.[0-9]+"/\1 "$(setup_ver)"/' "$(setup_iss)"
+	@rm -f $(setup_iss).bak
+	@git commit -m $(setup_ver) $(setup_iss)
 	@git tag $(setup_ver)
 	@git checkout contribute
 	@git merge master
-	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(curr_version)"/' \
-		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(curr_patch)"/' $(setup_src)
-	@rm -f "$(setup_src).bak"
-	@git commit -m "revert dev version" "$(setup_src)"
+	@sed -b -E -i.bak -e 's/(#define AppVersion) "[0-9]+\.[0-9]+\.[0-9]+"/\1 "$(next_version)"/' "$(setup_iss)"
+	@rm -f $(setup_iss).bak
+	@git commit -m "bump dev version" $(setup_iss)
 	@git checkout master
 	@echo tagged $(setup_ver)
-else
-	@sed -b -E -i.bak -e 's/(\#define GiPVersion) "[0-9]+\.[0-9]+"/\1 "$(curr_version)"/' \
-		-e 's/(\#define SetupPatch) "[0-9]+"/\1 "$(curr_patch)"/' $(setup_src)
-	@rm -f "$(setup_src).bak"
 endif
 
 clean:
-	@rm -f "$(build_setup)/$(setup_file)"
-	@rm -f "$(build_setup)/$(setup_file)".{md5,sha1,sha256}
-	@echo removed $(build_setup)/$(setup_file)
-	@rm -fr "$(src)"
-	@rm -fr "$(build_perl_edit)"
+	@rm -fr $(build_setup_exe)
+	@echo removed $(build_setup_exe)
+	@rm -fr $(src)
 	@echo removed $(src)
 
-distclean: clean
-	@rm -fr "$(build)"
+distclean:
+	@rm -fr $(build)
 	@echo removed $(build)
 
 release: clean checkout deps setup commit
 	@echo built release $(setup_ver)
 
 install:
-	@"$(build_setup)/$(setup_file)" //VERYSILENT //SUPPRESSMSGBOXES
+	@$(build_setup_exe) //VERYSILENT //SUPPRESSMSGBOXES //TASKS="desktopicons"
+	@echo installed
+
+installgui:
+	@$(build_setup_exe) //TASKS="desktopicons"
 	@echo installed
 
 uninstall:
-	@"$(gip_inst)/unins000.exe" //VERYSILENT //SUPPRESSMSGBOXES
+	@"$(gip_inst)"/unins000.exe //VERYSILENT //SUPPRESSMSGBOXES
+	@echo uninstalled
+
+uninstallgui:
+	@"$(gip_inst)"/unins000.exe
 	@echo uninstalled
