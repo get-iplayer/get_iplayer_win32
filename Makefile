@@ -30,17 +30,17 @@ ifdef TAG
 endif
 ifdef WIN64
 	bits := 64
-    arch := x64
+	arch := x64
 	DWIN64 := -DWIN64
 else
 	bits := 32
-    arch := x86
+	arch := x86
 endif
 setup_ver := $(VERSION).$(PATCH)
 ifndef WIP
-setup_tag := $(shell git tag -l $(setup_ver))
+	setup_tag := $(shell git tag -l $(setup_ver))
 ifeq ($(setup_tag), $(setup_ver))
-    WIP := 1
+	WIP := 1
 endif
 endif
 build := build-$(arch)
@@ -49,7 +49,7 @@ setup_name := get_iplayer
 setup_iss := $(setup_name).iss
 curr_version := $(shell awk '/#define AppVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_iss)")
 ifeq ($(setup_ver), 0.0.0)
-setup_ver := $(curr_version)
+	setup_ver := $(curr_version)
 endif
 next_version := $(shell echo $(setup_ver) | awk -F. '{print $$1"."$$2"."$$3+1}')
 setup_suffix := -setup
@@ -102,11 +102,12 @@ atomicparsley_zip := AtomicParsley-$(atomicparsley_ver)-windows-$(arch).zip
 atomicparsley_zip_url := https://github.com/get-iplayer/atomicparsley/releases/download/$(atomicparsley_ver)/$(atomicparsley_zip)
 build_atomicparsley_zip := $(build)/$(atomicparsley_zip)
 src_atomicparsley := $(src)/atomicparsley
-ffmpeg_ver := 4.3
-ffmpeg_zip := ffmpeg-$(ffmpeg_ver)-win$(bits)-static.zip
-ffmpeg_zip_url := https://ffmpeg.zeranoe.com/builds/win$(bits)/static/$(ffmpeg_zip)
+ffmpeg_ver := 4.3.1
+ffmpeg_zip := ffmpeg-$(ffmpeg_ver)-win$(bits).zip
+ffmpeg_zip_url := https://github.com/ShareX/FFmpeg/releases/download/v$(ffmpeg_ver)/$(ffmpeg_zip)
 build_ffmpeg_zip := $(build)/$(ffmpeg_zip)
 src_ffmpeg := $(src)/ffmpeg
+build_licenses := $(build)/licenses
 iscc_inst := $(prog_files_32)/Inno Setup 5
 iscc := $(iscc_inst)/ISCC.exe
 
@@ -219,11 +220,15 @@ ifndef NOUTILS
 	@touch $(build_ffmpeg_zip)
 endif
 
-$(src_ffmpeg): $(build_ffmpeg_zip)
+$(src_ffmpeg): $(build_ffmpeg_zip) $(build_licenses)
 ifndef NOUTILS
 	@mkdir -p $(src_ffmpeg)
-	@7za e -aoa -o$(src_ffmpeg) $(build_ffmpeg_zip) */bin/ffmpeg.exe */LICENSE.txt */README.txt
+	@7za e -aoa -o$(src_ffmpeg) $(build_ffmpeg_zip) ffmpeg.exe */LICENSE.txt */README.txt
 	@echo created $(src_ffmpeg)
+	@cp -f $(build_licenses)/lgpl-2.1.txt $(src_ffmpeg)
+	@cp -f $(build_licenses)/lgpl.txt $(src_ffmpeg)
+	@cp -f $(build_licenses)/gpl-2.0.txt $(src_ffmpeg)
+	@cp -f $(build_licenses)/gpl.txt $(src_ffmpeg)
 	@touch $(src_ffmpeg)
 endif
 
@@ -237,6 +242,23 @@ utils: atomicparsley ffmpeg
 
 utilsclean: atomicparsleyclean ffmpegclean
 
+$(build_licenses):
+ifndef NOLICENSES
+	@mkdir -p $(build_licenses)
+	@curl -\#fkL -o $(build_licenses)/gpl.txt https://www.gnu.org/licenses/gpl.txt
+	@curl -\#fkL -o $(build_licenses)/lgpl.txt https://www.gnu.org/licenses/lgpl.txt
+	@curl -\#fkL -o $(build_licenses)/gpl-2.0.txt https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+	@curl -\#fkL -o $(build_licenses)/lgpl-2.1.txt https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+	@echo created $(build_licenses)
+	@touch $(build_licenses)
+endif
+
+licenses: $(build_licenses)
+
+licensesclean:
+	@rm -fr $(build_licenses)
+	@echo removed $(build_licenses)
+	
 deps: perl gip atomicparsley ffmpeg
 
 depsclean: perlclean gipclean atomicparsleyclean ffmpegclean
@@ -271,13 +293,10 @@ ifndef WIP
 	@rm -f $(setup_iss).bak
 	@git commit -m $(setup_ver) $(setup_iss)
 	@git tag $(setup_ver)
-	@git checkout contribute
-	@git merge master
+	@echo tagged $(setup_ver)
 	@sed -b -E -i.bak -e 's/(#define AppVersion) "[0-9]+\.[0-9]+\.[0-9]+"/\1 "$(next_version)"/' "$(setup_iss)"
 	@rm -f $(setup_iss).bak
-	@git commit -m "bump dev version" $(setup_iss)
-	@git checkout master
-	@echo tagged $(setup_ver)
+	@git commit -m "bump version" $(setup_iss)
 endif
 
 clean:

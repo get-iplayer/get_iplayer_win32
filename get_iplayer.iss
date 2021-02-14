@@ -78,6 +78,8 @@ Type: files; Name: {#UtilsDir}\ffmpeg.exe;
 Type: filesandordirs; Name: {#UtilsDir}\licenses;
 Type: filesandordirs; Name: {group}\Help;
 Type: files; Name: {group}\Uninstall {#AppName}
+Type: files; Name: {#LicensesDir}\ffmpeg\LICENSE.txt;
+Type: files; Name: {#LicensesDir}\ffmpeg\README.txt;
 ; remove obsolete uninstallers
 Type: files; Name: {app}\Uninst.exe;
 Type: files; Name: {app}\uninstall.exe;
@@ -113,8 +115,10 @@ Source: {#PerlSrc}\licenses\*; DestDir: {#LicensesDir}; Flags: recursesubdirs cr
 Source: {#AtomicParsleySrc}\AtomicParsley.exe; DestDir: {#UtilsDir}\bin; MinVersion: 6.1;
 Source: {#AtomicParsleySrc}\COPYING; DestDir: {#LicensesDir}\atomicparsley; MinVersion: 6.1;
 Source: {#FFmpegSrc}\ffmpeg.exe; DestDir: {#UtilsDir}\bin; MinVersion: 6.1;
-Source: {#FFmpegSrc}\LICENSE.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
-Source: {#FFmpegSrc}\README.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
+Source: {#FFmpegSrc}\lgpl-2.1.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
+Source: {#FFmpegSrc}\lgpl.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
+Source: {#FFmpegSrc}\gpl-2.0.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
+Source: {#FFmpegSrc}\gpl.txt; DestDir: {#LicensesDir}\ffmpeg; MinVersion: 6.1;
 #endif
 
 [Icons]
