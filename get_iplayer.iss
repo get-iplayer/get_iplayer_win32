@@ -153,7 +153,7 @@ Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environmen
 [Run]
 Filename: {#GiPWiki}/releasenotes; Description: View {#AppName} release notes; \
   Flags: postinstall shellexec skipifsilent nowait;
-Filename: {group}\Help\{#AppName} Documentation.url; Description: View {#AppName} documentation; \
+Filename: {group}\{#AppName} Documentation.url; Description: View {#AppName} documentation; \
   Flags: postinstall shellexec skipifsilent nowait unchecked;
 Filename: {cmd}; Parameters: "/k ""set ""PATH=%PATH%;{app}"" && ""{app}\get_iplayer.cmd"" --search dontshowanymatches && ""{app}\get_iplayer.cmd"" --help"""; \
   WorkingDir: {%HOMEDRIVE}{%HOMEPATH}; Description: Launch {#AppName};  \
