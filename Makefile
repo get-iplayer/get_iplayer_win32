@@ -102,12 +102,11 @@ atomicparsley_zip := AtomicParsley-$(atomicparsley_ver)-windows-$(arch).zip
 atomicparsley_zip_url := https://github.com/get-iplayer/atomicparsley/releases/download/$(atomicparsley_ver)/$(atomicparsley_zip)
 build_atomicparsley_zip := $(build)/$(atomicparsley_zip)
 src_atomicparsley := $(src)/atomicparsley
-ffmpeg_ver := 4.3.1
-ffmpeg_zip := ffmpeg-$(ffmpeg_ver)-win$(bits).zip
-ffmpeg_zip_url := https://github.com/ShareX/FFmpeg/releases/download/v$(ffmpeg_ver)/$(ffmpeg_zip)
+ffmpeg_ver := 4.2.3
+ffmpeg_zip := ffmpeg-$(ffmpeg_ver)-win$(bits)-static.zip
+ffmpeg_zip_url := https://github.com/advancedfx/ffmpeg.zeranoe.com-builds-mirror/releases/download/20200915/$(ffmpeg_zip)
 build_ffmpeg_zip := $(build)/$(ffmpeg_zip)
 src_ffmpeg := $(src)/ffmpeg
-build_licenses := $(build)/licenses
 iscc_inst := $(prog_files_32)/Inno Setup 5
 iscc := $(iscc_inst)/ISCC.exe
 
@@ -220,15 +219,11 @@ ifndef NOUTILS
 	@touch $(build_ffmpeg_zip)
 endif
 
-$(src_ffmpeg): $(build_ffmpeg_zip) $(build_licenses)
+$(src_ffmpeg): $(build_ffmpeg_zip)
 ifndef NOUTILS
 	@mkdir -p $(src_ffmpeg)
-	@7za e -aoa -o$(src_ffmpeg) $(build_ffmpeg_zip) ffmpeg.exe */LICENSE.txt */README.txt
+	@7za e -aoa -o$(src_ffmpeg) $(build_ffmpeg_zip) */bin/ffmpeg.exe */LICENSE.txt */README.txt
 	@echo created $(src_ffmpeg)
-	@cp -f $(build_licenses)/lgpl-2.1.txt $(src_ffmpeg)
-	@cp -f $(build_licenses)/lgpl.txt $(src_ffmpeg)
-	@cp -f $(build_licenses)/gpl-2.0.txt $(src_ffmpeg)
-	@cp -f $(build_licenses)/gpl.txt $(src_ffmpeg)
 	@touch $(src_ffmpeg)
 endif
 
