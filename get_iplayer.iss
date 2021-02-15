@@ -5,7 +5,7 @@
 ; #define WIN64
 #define AppName "get_iplayer"
 #ifndef AppVersion
-  #define AppVersion "3.27.0"
+  #define AppVersion "3.27.1"
 #endif
 #ifdef WIN64
 	#define AppArch "x64"
