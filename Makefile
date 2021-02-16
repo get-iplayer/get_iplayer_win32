@@ -47,11 +47,7 @@ build := build-$(arch)
 src := $(build)/src
 setup_name := get_iplayer
 setup_iss := $(setup_name).iss
-curr_version := $(shell awk '/#define AppVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_iss)")
-ifeq ($(setup_ver), 0.0.0)
-	setup_ver := $(curr_version)
-endif
-next_version := $(shell echo $(setup_ver) | awk -F. '{print $$1"."$$2"."$$3+1}')
+curr_ver := $(shell awk '/#define AppVersion/ {gsub("\"", "", $$3); print $$3;}' "$(setup_iss)")
 setup_suffix := -setup
 ifdef NOPERL
 	DNOPERL := -DNOPERL
@@ -67,9 +63,9 @@ build_setup_exe := $(build)/$(setup_exe)
 prog_files := $(PROGRAMFILES)
 prog_files_32 := $(PROGRAMFILES) (x86)
 ifdef WIN64
-gip_inst := $(prog_files)/$(setup_name)
+	gip_inst := $(prog_files)/$(setup_name)
 else
-gip_inst := $(prog_files_32)/$(setup_name)
+	gip_inst := $(prog_files_32)/$(setup_name)
 endif
 sbpl_ver := 5.30.2.1
 sbpl_base := strawberry-perl-$(sbpl_ver)-$(bits)bit-portable
@@ -283,15 +279,15 @@ ifndef WIP
 endif
 
 commit:
-ifndef WIP
 	@sed -b -E -i.bak -e 's/(#define AppVersion) "[0-9]+\.[0-9]+\.[0-9]+"/\1 "$(setup_ver)"/' "$(setup_iss)"
 	@rm -f $(setup_iss).bak
+ifndef WIP
 	@git commit -m $(setup_ver) $(setup_iss)
 	@git tag $(setup_ver)
 	@echo tagged $(setup_ver)
-	@sed -b -E -i.bak -e 's/(#define AppVersion) "[0-9]+\.[0-9]+\.[0-9]+"/\1 "$(next_version)"/' "$(setup_iss)"
+else
+	@sed -b -E -i.bak -e 's/(#define AppVersion) "[0-9]+\.[0-9]+\.[0-9]+"/\1 "$(curr_ver)"/' "$(setup_iss)"
 	@rm -f $(setup_iss).bak
-	@git commit -m "bump version" $(setup_iss)
 endif
 
 clean:
