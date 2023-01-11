@@ -12,12 +12,16 @@ https://github.com/StrawberryPerl/Perl-Dist-Strawberry
 
 AtomicParsley
 =============
+http://atomicparsley.sourceforge.net
 https://github.com/get-iplayer/atomicparsley
 
 FFmpeg
 ======
-https://ffmpeg.zeranoe.com
+https://ffmpeg.org
 https://git.ffmpeg.org/gitweb/ffmpeg
+https://www.gyan.dev/ffmpeg/builds/
+https://github.com/sudo-nautilus/FFmpeg-Builds-Win32/
+https://github.com/eugeneware/ffmpeg-static
 
 OpenSSL
 =======
@@ -44,6 +48,6 @@ libgdbm
 https://www.gnu.org/software/gdbm
 https://ftp.gnu.org/gnu/gdbm
 
-libxz
+liblzma
 =======
 https://tukaani.org/xz

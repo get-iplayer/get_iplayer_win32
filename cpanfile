@@ -1,0 +1,13 @@
+requires 'LWP';
+requires 'LWP::Protocol::https';
+requires 'Mojolicious';
+requires 'Alien::Build', '<= 2.26';
+requires 'Alien::Libxml2', '<= 0.16';
+requires 'XML::LibXML';
+requires 'CGI';
+requires 'File::HomeDir';
+requires 'JSON';
+requires 'JSON::XS';
+requires 'Win32', '<= 0.54';
+requires 'Win32::Unicode';
+requires 'Win32::LongPath';
