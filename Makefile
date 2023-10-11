@@ -113,7 +113,7 @@ ifdef WIN64
 else
 	atomicparsley_arch := i386
 endif
-atomicparsley_ver := 0.9.7-get_iplayer.3
+atomicparsley_ver := 0.9.7-get_iplayer.4
 atomicparsley_zip_file := AtomicParsley-$(atomicparsley_ver)-windows-$(atomicparsley_arch)-static.zip
 atomicparsley_zip_url := https://github.com/get-iplayer/atomicparsley/releases/download/$(atomicparsley_ver)/$(atomicparsley_zip_file)
 atomicparsley_zip_path := $(build)/$(atomicparsley_zip_file)
@@ -124,14 +124,14 @@ ifdef WIN64
 else
 	ffmpeg_arch := ia32
 endif
-ffmpeg_ver := 5.0.1
-ffmpeg_base := win32-$(ffmpeg_arch)
-ffmpeg_zip_file := ffmpeg-$(ffmpeg_ver)-$(ffmpeg_base).gz
+ffmpeg_ver := 6.0
+ffmpeg_base := ffmpeg-$(ffmpeg_ver)-win32-$(ffmpeg_arch)
+ffmpeg_zip_file := $(ffmpeg_base).gz
 ffmpeg_zip_path := $(build)/$(ffmpeg_zip_file)
-ffmpeg_zip_url := https://github.com/eugeneware/ffmpeg-static/releases/download/b$(ffmpeg_ver)/$(ffmpeg_base).gz
-ffmpeg_lic_file := ffmpeg-$(ffmpeg_ver)-$(ffmpeg_base).LICENSE
+ffmpeg_zip_url := https://github.com/eugeneware/ffmpeg-static/releases/download/b$(ffmpeg_ver)/ffmpeg-win32-$(ffmpeg_arch).gz
+ffmpeg_lic_file := $(ffmpeg_base).LICENSE
 ffmpeg_lic_path := $(build)/$(ffmpeg_lic_file)
-ffmpeg_lic_url := https://github.com/eugeneware/ffmpeg-static/releases/download/b$(ffmpeg_ver)/$(ffmpeg_base).LICENSE
+ffmpeg_lic_url := https://github.com/eugeneware/ffmpeg-static/releases/download/b$(ffmpeg_ver)/win32-x64.LICENSE
 ffmpeg_src_dir := $(src)/ffmpeg
 
 dummy:
