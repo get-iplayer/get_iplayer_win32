@@ -37,7 +37,7 @@
 #define HomeDir "%HOMEDRIVE%%HOMEPATH%"
 
 [Setup]
-AppCopyright=Copyright (C) 2008-2010 Phil Lewis
+AppCopyright=Copyright (C) 2008-2010 Phil Lewis, 2010- get_iplayer contributors
 AppName={#AppName}
 AppPublisher=The {#AppName} Contributors
 AppPublisherURL={#GiPRepo}
